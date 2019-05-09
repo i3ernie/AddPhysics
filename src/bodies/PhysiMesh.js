@@ -22,6 +22,10 @@ let PhysicsBody = function( mesh, opt ){
     
     opt = Object.assign( {}, defaults, opt||{} );
     
+    if ( mesh.parent && mesh.parent instanceof THREE.Scene ) {
+        mesh.parent.dispatchEvent({type:"physicsBodyAdded", object:this});
+    }
+    
     mesh.addEventListener("added", function(){
         this.parent.dispatchEvent({type:"physicsBodyAdded", object:this});
     });

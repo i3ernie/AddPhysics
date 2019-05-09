@@ -1,4 +1,5 @@
 'use strict';
+
 var
 	transferableMessage = self.webkitPostMessage || self.postMessage,
 

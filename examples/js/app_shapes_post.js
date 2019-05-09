@@ -89,51 +89,54 @@ Physijs.scripts.ammo = '../examples/js/ammo.js';
 		ground_material.map.repeat.set( 2.5, 2.5 );
 		
 		// Ground
-		ground = new Physijs.BoxMesh(
+		ground = new THREE.Mesh(
 			new THREE.BoxGeometry(50, 1, 50),
 			//new THREE.PlaneGeometry(50, 50),
-			ground_material,
-			0 // mass
+			ground_material
 		);
 		ground.receiveShadow = true;
-		scene.add( ground );
 		
 		// Bumpers
-		var bumper,
-			bumper_geom = new THREE.BoxGeometry(2, 1, 50);
+		let bumper_geom = new THREE.BoxGeometry(2, 1, 50);
 		
-		bumper = new Physijs.BoxMesh( bumper_geom, ground_material, 0, { restitution: .2 } );
-		bumper.position.y = 1;
-		bumper.position.x = -24;
-		bumper.receiveShadow = true;
-		bumper.castShadow = true;
-		scene.add( bumper );
+		let bumper1 = new THREE.Mesh( bumper_geom, ground_material );
+		bumper1.position.y = 1;
+		bumper1.position.x = -24;
+		bumper1.receiveShadow = true;
+		bumper1.castShadow = true;
 		
-		bumper = new Physijs.BoxMesh( bumper_geom, ground_material, 0, { restitution: .2 } );
-		bumper.position.y = 1;
-		bumper.position.x = 24;
-		bumper.receiveShadow = true;
-		bumper.castShadow = true;
-		scene.add( bumper );
+		let bumper2 = new THREE.Mesh( bumper_geom, ground_material );
+		bumper2.position.y = 1;
+		bumper2.position.x = 24;
+		bumper2.receiveShadow = true;
+		bumper2.castShadow = true;
 		
-		bumper = new THREE.Mesh( bumper_geom, ground_material );
-                Physijs.BoxBody.addPhysics( bumper, { mass: 0, restitution: .2 } );
-		bumper.position.y = 1;
-		bumper.position.z = -24;
-		bumper.rotation.y = Math.PI / 2;
-		bumper.receiveShadow = true;
-		bumper.castShadow = true;
-		scene.add( bumper );
-		
-		bumper = new THREE.Mesh( bumper_geom, ground_material );
-                Physijs.BoxBody.addPhysics( bumper, { mass: 0, restitution: .2 } );
-		bumper.position.y = 1;
-		bumper.position.z = 24;
-		bumper.rotation.y = Math.PI / 2;
-		bumper.receiveShadow = true;
-		bumper.castShadow = true;
-		scene.add( bumper );
-		
+		let bumper3 = new THREE.Mesh( bumper_geom, ground_material );
+		bumper3.position.y = 1;
+		bumper3.position.z = -24;
+		bumper3.rotation.y = Math.PI / 2;
+		bumper3.receiveShadow = true;
+		bumper3.castShadow = true;
+	
+		let bumper4 = new THREE.Mesh( bumper_geom, ground_material );
+		bumper4.position.y = 1;
+		bumper4.position.z = 24;
+		bumper4.rotation.y = Math.PI / 2;
+		bumper4.receiveShadow = true;
+		bumper4.castShadow = true;
+                
+                Physijs.BoxBody.addPhysics( ground, { mass: 0 } );
+                Physijs.BoxBody.addPhysics( bumper1, { mass: 0, restitution: .2 } );
+                Physijs.BoxBody.addPhysics( bumper2, { mass: 0, restitution: .2 } );
+                Physijs.BoxBody.addPhysics( bumper3, { mass: 0, restitution: .2 } );
+                Physijs.BoxBody.addPhysics( bumper4, { mass: 0, restitution: .2 } );
+                
+                scene.add( ground );
+                scene.add( bumper1 );
+                scene.add( bumper2 );
+                scene.add( bumper3 );
+                scene.add( bumper4 );
+            
 		requestAnimationFrame( render );
 		physicsWorld.simulate();
 
