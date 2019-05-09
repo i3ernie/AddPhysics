@@ -244,6 +244,7 @@ public_functions.init = function( params ) {
 	importScripts( params.ammo );
         
         importScripts( "./constraints/worker_dof_constraint.js" );
+        importScripts( "./constraints/worker_HingeConstraint.js" );
 
 	_transform = new Ammo.btTransform;
 	_vec3_1 = new Ammo.btVector3(0,0,0);
@@ -921,23 +922,6 @@ public_functions.simulate = function simulate( params ) {
 
 
 // Constraint functions
-public_functions.hinge_setLimits = function( params ) {
-	_constraints[ params.constraint ].setLimit( params.low, params.high, 0, params.bias_factor, params.relaxation_factor );
-};
-public_functions.hinge_enableAngularMotor = function( params ) {
-	var constraint = _constraints[ params.constraint ];
-	constraint.enableAngularMotor( true, params.velocity, params.acceleration );
-	constraint.getRigidBodyA().activate();
-	if ( constraint.getRigidBodyB() ) {
-		constraint.getRigidBodyB().activate();
-	}
-};
-public_functions.hinge_disableMotor = function( params ) {
-	_constraints[ params.constraint ].enableMotor( false );
-	if ( constraint.getRigidBodyB() ) {
-		constraint.getRigidBodyB().activate();
-	}
-};
 
 public_functions.slider_setLimits = function( params ) {
 	var constraint = _constraints[ params.constraint ];
