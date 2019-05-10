@@ -40,16 +40,16 @@ Physijs.scripts.ammo = '../examples/js/ammo.js';
 		document.getElementById( 'viewport' ).appendChild( physics_stats.domElement );
 		
                 scene = new THREE.Scene();
-                physicsWorld = Physijs.PhysicsWorld.addPhysics( scene, { fixedTimeStep: 1 / 120 } );
+                
+                physicsWorld = Physijs.PhysicsWorld.addPhysics( scene, { 
+                    fixedTimeStep: 1 / 120, 
+                    gravity : new THREE.Vector3( 0, -30, 0 ) 
+                });
 		
-                physicsWorld.setGravity(new THREE.Vector3( 0, -30, 0 ));
-		physicsWorld.addEventListener(
-			'update',
-			function() {
-				physicsWorld.simulate( undefined, 2 );
-				physics_stats.update();
-			}
-		);
+		physicsWorld.addEventListener( 'update', function() {
+                        physicsWorld.simulate( undefined, 2 );
+                        physics_stats.update();
+		});
 		
 		camera = new THREE.PerspectiveCamera(
 			35,
@@ -219,7 +219,7 @@ Physijs.scripts.ammo = '../examples/js/ammo.js';
 					);
 					break;
 			}
-                        Physijs.ObjectBody.addPhysics( shape, opt );
+                  
 				
 			shape.material.color.setRGB( Math.random() * 100 / 100, Math.random() * 100 / 100, Math.random() * 100 / 100 );
 			shape.castShadow = true;
@@ -237,10 +237,15 @@ Physijs.scripts.ammo = '../examples/js/ammo.js';
 				Math.random() * Math.PI
 			);
 			
-			if ( addshapes ) {
-				shape.addEventListener( 'ready', createShape );
+			if ( addshapes ) { 
+				shape.addEventListener( 'ready', function(){ setTimeout(createShape, 500); } );
 			}
-			scene.add( shape );
+                        
+                        scene.add( shape );
+                        
+                        Physijs.ObjectBody.addPhysics( shape, opt );
+                        
+			
 			
 			new TWEEN.Tween( shape.material ).to({opacity: 1}, 500).start();
 			
