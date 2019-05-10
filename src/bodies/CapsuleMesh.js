@@ -34,7 +34,9 @@ Body.prototype = Object.assign({}, PhysicsBody.prototype, {
     constructor : Body
 });
 Body.addPhysics = function( mesh, opt ){
-    
+    if ( mesh.parent && mesh.parent instanceof THREE.Scene ) {
+        mesh.parent.dispatchEvent({type:"physicsBodyAdded", object:mesh});
+    }
 };
 
 // Physijs.CapsuleMesh

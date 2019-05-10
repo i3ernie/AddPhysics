@@ -36,6 +36,9 @@ Body.prototype = Object.assign({}, PhysicsBody.prototype, {
 
 Body.addPhysics = function( mesh, opt ){
     mesh.physicsBody = new Body( mesh, opt );
+    if ( mesh.parent && mesh.parent instanceof THREE.Scene ) {
+        mesh.parent.dispatchEvent({type:"physicsBodyAdded", object:mesh});
+    }
 };
 
 

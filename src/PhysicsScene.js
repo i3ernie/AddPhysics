@@ -168,6 +168,9 @@ const PhysicsWorld = function( scene, params ){
         params.fixedTimeStep = params.fixedTimeStep || 1 / 60;
         params.rateLimit = params.rateLimit || true;
         this.execute( 'init', params );
+        if ( params.gravity ) {
+            this.execute( 'setGravity', params.gravity );
+	}
 };
 
 PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDispatcher.prototype, {
