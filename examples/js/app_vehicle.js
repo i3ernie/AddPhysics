@@ -10,7 +10,7 @@
         import Stats from "./stats.module.js";
         import LegacyJSONLoader from './extras/loader/JSONLoader.js';
 	
-	Physijs.scripts.worker = '../src/physijs_worker.js';
+	Physijs.scripts.worker = '../src/AddPhysics_worker.js';
 	Physijs.scripts.ammo = '../examples/js/ammo.js';
 	
 	var initScene, render,
