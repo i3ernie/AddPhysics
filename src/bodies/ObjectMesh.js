@@ -61,7 +61,19 @@ const Body = function( mesh, opt ){
     }
 };
 Body.addPhysics = function( mesh, opt ) {
+        
+    if ( mesh instanceof Array ){
+        let i;
+        for( i in mesh ){ 
+            if ( mesh[i].userData.physics ) Body.addPhysics( mesh[i] );
+        }
+        return;
+    }
     
+    if ( !mesh instanceof THREE.Mesh ) {
+        return;
+    }
+
     switch ( mesh.geometry.type ) 
     {
         case "SphereGeometry":

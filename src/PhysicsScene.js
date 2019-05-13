@@ -224,7 +224,9 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
     },
     
     onRemove : function( object ) {
+        
         let _physijs = object.physicsBody._physijs;
+        
         if ( object instanceof Vehicle ) {
             this.execute( 'removeVehicle', { id: _physijs.id } );
             while( object.wheels.length ) {

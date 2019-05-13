@@ -9,37 +9,39 @@ import { Mesh, PhysicsBody } from './PhysiMesh.js';
 import * as THREE from "../three.module.js";
 
 const _make = function( mesh, opt ){
+    
+    this._physijs.type = 'box';
+    _volume.call( this, mesh, opt );
+    this._physijs.mass = (typeof opt.mass === 'undefined') ? this._physijs.volume : opt.mass;
+};
+
+const _volume = function( mesh, opt ){
     let geometry = mesh.geometry;
 
     let width = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
     let height = geometry.boundingBox.max.y - geometry.boundingBox.min.y;
     let depth = geometry.boundingBox.max.z - geometry.boundingBox.min.z;
-
-
-    this._physijs.type = 'box';
+    
     this._physijs.width = width;
     this._physijs.height = height;
     this._physijs.depth = depth;
-    this._physijs.mass = (typeof opt.mass === 'undefined') ? width * height * depth : opt.mass;
+    
+    this._physijs.volume = ( typeof opt.volume === 'number' ) ? opt.volume : width * height * depth;
 };
 
 const Body = function( mesh, opt ) {
-    opt = opt || {};
+    opt = Object.assign( {}, mesh.userData.physics, opt );
     PhysicsBody.call( this, mesh, opt );
-    _make.call( this, mesh, opt );
-    
+    _make.call( this, mesh, opt );    
 };
+
 Body.prototype = Object.assign({}, PhysicsBody.prototype, {
     constructor : Body
 });
 
 Body.addPhysics = function( mesh, opt ){
-    mesh.physicsBody = new Body( mesh, opt );
-    if ( mesh.parent && mesh.parent instanceof THREE.Scene ) {
-        mesh.parent.dispatchEvent({type:"physicsBodyAdded", object:mesh});
-    }
+    PhysicsBody.add( Body, mesh, opt );
 };
-
 
 let BoxMesh = function( geometry, material, mass ) {
 

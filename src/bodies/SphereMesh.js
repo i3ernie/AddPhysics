@@ -8,14 +8,21 @@ import { Mesh, PhysicsBody } from './PhysiMesh.js';
 import * as THREE from "../three.module.js";
 
 const _make = function( mesh, opt ){
-    let geometry = mesh.geometry;
+    const geometry = mesh.geometry;
+    
     if ( !geometry.boundingSphere ) {
         geometry.computeBoundingSphere();
     }
+    _volume.call( this, mesh, opt );
 
     this._physijs.type = 'sphere';
     this._physijs.radius = geometry.boundingSphere.radius;
-    this._physijs.mass = (typeof opt.mass === 'undefined') ? (4/3) * Math.PI * Math.pow(this._physijs.radius, 3) : opt.mass;
+    this._physijs.mass = (typeof opt.mass === 'undefined') ? this._physijs.volume : opt.mass;
+};
+
+const _volume = function( mesh, opt ){
+    const geometry = mesh.geometry;
+    this._physijs.volume = (4/3) * Math.PI * Math.pow( geometry.boundingSphere.radius, 3 );
 };
 
 const Body = function( mesh, opt ){    
@@ -29,10 +36,7 @@ Body.prototype = Object.assign( {}, PhysicsBody.prototype, {
 });
 
 Body.addPhysics = function( mesh, opt ){
-    mesh.physicsBody = new Body( mesh, opt );
-    if ( mesh.parent && mesh.parent instanceof THREE.Scene ) {
-        mesh.parent.dispatchEvent({type:"physicsBodyAdded", object:mesh});
-    }
+    PhysicsBody.add( Body, mesh, opt );
 };
 
 // Physijs.SphereMesh

@@ -20,8 +20,8 @@ let PhysicsBody = function( mesh, opt ){
         mesh.geometry.computeBoundingBox();
     }
     
-    opt = Object.assign( {}, defaults, opt||{} );
-    
+    opt = Object.assign( {}, defaults, mesh.userData.physics, opt );
+
     
     mesh.addEventListener("added", function(){
         this.parent.dispatchEvent({type:"physicsBodyAdded", object:this});
@@ -39,6 +39,14 @@ let PhysicsBody = function( mesh, opt ){
         angularVelocity: new THREE.Vector3()
     };
     
+};
+
+PhysicsBody.add = function ( Body, mesh, opt ){
+    mesh.physicsBody = new Body( mesh, opt );
+    if ( mesh.parent && mesh.parent instanceof THREE.Scene ) {
+        mesh.parent.dispatchEvent({type:"physicsBodyAdded", object:mesh});
+    };
+    return mesh.physicsBody;
 };
 
 PhysicsBody.prototype = Object.assign( Object.create( PhysicsBody.prototype), {
