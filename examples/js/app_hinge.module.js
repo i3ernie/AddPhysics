@@ -3,7 +3,7 @@
         import * as THREE from '../../src/three.module.js';
         import Stats from "./stats.module.js";
 	
-	Physijs.scripts.worker = '../src/physijs_worker.js';
+	Physijs.scripts.worker = '../src/AddPhysics_worker.js';
 	Physijs.scripts.ammo = '../examples/js/ammo.js';
 	
 	var initScene, render, applyForce, setMousePosition, mouse_position,
