@@ -9,6 +9,8 @@ import * as THREE from "../three.module.js";
 
 _make = function( mesh, opt ){
     let obj = processGeometry( mesh.geometry );
+    
+    this._physijs.type = 'soft';
     this._physijs.ammoVertices = obj.ammoVertices;
     this._physijs.ammoIndices = obj.ammoIndices;
     this._physijs.ammoIndexAssociation = obj.ammoIndexAssociation;    
@@ -56,10 +58,10 @@ function processGeometry( bufGeometry ) {
             }
     }
 
-let SoftMesh = function( geometry, material, mass, pessure ){
+let SoftMesh = function( geometry, material, mass, pressure ){
     
     Mesh.call( this, geometry, material, mass );
-    _make.call( this, this, { mass: mass, pessure: pessure } );
+    _make.call( this, this, { mass: mass, pressure: pressure } );
     
     
     //var volume = new THREE.Mesh( bufferGeom, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
