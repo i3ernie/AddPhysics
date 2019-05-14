@@ -8,7 +8,10 @@ import { Mesh, PhysicsBody } from './PhysiMesh.js';
 import * as THREE from "../three.module.js";
 
 _make = function( mesh, opt ){
-    processGeometry( mesh.geometry );
+    let obj = processGeometry( mesh.geometry );
+    this._physijs.ammoVertices = obj.ammoVertices;
+    this._physijs.ammoIndices = obj.ammoIndices;
+    this._physijs.ammoIndexAssociation = obj.ammoIndexAssociation;    
 };
 
 let Body = function( mesh, opt){
@@ -16,31 +19,34 @@ let Body = function( mesh, opt){
 };
 
 function processGeometry( bufGeometry ) {
-        // Ony consider the position values when merging the vertices
-        var posOnlyBufGeometry = new THREE.BufferGeometry();
-        posOnlyBufGeometry.addAttribute( 'position', bufGeometry.getAttribute( 'position' ) );
-        posOnlyBufGeometry.setIndex( bufGeometry.getIndex() );
-        // Merge the vertices so the triangle soup is converted to indexed triangles
-        var indexedBufferGeom = THREE.BufferGeometryUtils.mergeVertices( posOnlyBufGeometry );
-        // Create index arrays mapping the indexed vertices to bufGeometry vertices
-        mapIndices( bufGeometry, indexedBufferGeom );
+    // Ony consider the position values when merging the vertices
+    var posOnlyBufGeometry = new THREE.BufferGeometry();
+    posOnlyBufGeometry.addAttribute( 'position', bufGeometry.getAttribute( 'position' ) );
+    posOnlyBufGeometry.setIndex( bufGeometry.getIndex() );
+    // Merge the vertices so the triangle soup is converted to indexed triangles
+    var indexedBufferGeom = THREE.BufferGeometryUtils.mergeVertices( posOnlyBufGeometry );
+    // Create index arrays mapping the indexed vertices to bufGeometry vertices
+    let ret = mapIndices( bufGeometry, indexedBufferGeom );
+    return ret;
 }
 
     function mapIndices( bufGeometry, indexedBufferGeom ) {
             // Creates ammoVertices, ammoIndices and ammoIndexAssociation in bufGeometry
+            let ret = {};
             var vertices = bufGeometry.attributes.position.array;
             var idxVertices = indexedBufferGeom.attributes.position.array;
             var indices = indexedBufferGeom.index.array;
             var numIdxVertices = idxVertices.length / 3;
             var numVertices = vertices.length / 3;
-            bufGeometry.ammoVertices = idxVertices;
-            bufGeometry.ammoIndices = indices;
-            bufGeometry.ammoIndexAssociation = [];
-            for ( var i = 0; i < numIdxVertices; i ++ ) {
+           
+            ret.ammoVertices = idxVertices;
+            ret.ammoIndices = indices;
+            ret.ammoIndexAssociation = [];
+            for ( let i = 0; i < numIdxVertices; i ++ ) {
                     var association = [];
-                    bufGeometry.ammoIndexAssociation.push( association );
+                    ret.ammoIndexAssociation.push( association );
                     var i3 = i * 3;
-                    for ( var j = 0; j < numVertices; j ++ ) {
+                    for ( let j = 0; j < numVertices; j ++ ) {
                             var j3 = j * 3;
                             if ( isEqual( idxVertices[ i3 ], idxVertices[ i3 + 1 ], idxVertices[ i3 + 2 ],
                                     vertices[ j3 ], vertices[ j3 + 1 ], vertices[ j3 + 2 ] ) ) {
