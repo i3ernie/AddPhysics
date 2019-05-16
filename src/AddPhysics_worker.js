@@ -8,6 +8,7 @@ importScripts( "./worker/globals.js" );
 importScripts( "./worker/init.js" );
 importScripts( "./worker/world.js" );
 importScripts( "./worker/Shapes.js" );
+importScripts( "./worker/SoftShape.js" );
 importScripts( "./worker/vehicle.js" );
 
 

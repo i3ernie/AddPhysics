@@ -22,6 +22,8 @@ import { ConvexMesh, ConvexBody } from './bodies/ConvexMesh.js';
 import { CapsuleMesh, CapsuleBody } from './bodies/CapsuleMesh.js';
 import { PlaneMesh, PlaneBody } from './bodies/PlaneMesh.js';
 import { ConcaveMesh } from './bodies/ConcaveMesh.js';
+import { SoftMesh } from './bodies/SoftMesh.js';
+
 import { createMaterial } from './PhysiMaterial.js';
 
 let _Physijs = window.Physijs; // used for noConflict method
@@ -59,6 +61,7 @@ let Physijs = {
         PlaneBody : PlaneBody,
         SphereMesh : SphereMesh,
         SphereBody : SphereBody,
+        SoftMesh : SoftMesh,
         
         Vehicle : Vehicle,
         VehicleTuning : VehicleTuning

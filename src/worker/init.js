@@ -6,15 +6,30 @@
 (function( self ){
     
     let public_functions = self.public_functions;
+    let AMMO;
     
     public_functions.init = function( params ) {
-            importScripts( params.ammo );
+            
+        importScripts( params.ammo );
+        
+        
+        if (typeof Ammo !== "function"){
+            AMMO = function(){ return {
+                    then : function( fnc ){ fnc( Ammo ); }
+            }; };
+	}
+        else {
+            AMMO = Ammo;
+        }
+        
+        AMMO().then( function( Ammolib ) {
+            Ammo = Ammolib;
             
             _transform = new Ammo.btTransform;
-            _vec3_1 = new Ammo.btVector3(0,0,0);
-            _vec3_2 = new Ammo.btVector3(0,0,0);
-            _vec3_3 = new Ammo.btVector3(0,0,0);
-            _quat = new Ammo.btQuaternion(0,0,0,0);
+            _vec3_1 = new Ammo.btVector3( 0, 0, 0 );
+            _vec3_2 = new Ammo.btVector3( 0, 0, 0 );
+            _vec3_3 = new Ammo.btVector3( 0, 0, 0 );
+            _quat = new Ammo.btQuaternion( 0, 0, 0, 0 );
 
             self.dispatchEvent( new CustomEvent("init", {
                 detail: {
@@ -42,7 +57,7 @@
             vehiclereport[0] = MESSAGE_TYPES.VEHICLEREPORT;
             constraintreport[0] = MESSAGE_TYPES.CONSTRAINTREPORT;
 
-            var collisionConfiguration = new Ammo.btDefaultCollisionConfiguration,
+            let collisionConfiguration = new Ammo.btDefaultCollisionConfiguration,
                     dispatcher = new Ammo.btCollisionDispatcher( collisionConfiguration ),
                     solver = new Ammo.btSequentialImpulseConstraintSolver,
                     broadphase;
@@ -71,13 +86,20 @@
                             broadphase = new Ammo.btDbvtBroadphase;
                             break;
             }
-
-            world = new Ammo.btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration );
+            
+            if ( params.type === "soft" ) {
+                let softBodySolver = new Ammo.btDefaultSoftBodySolver();
+                world = new Ammo.btSoftRigidDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration, softBodySolver );
+            } else {
+                world = new Ammo.btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration );
+            }
+            
 
             fixedTimeStep = params.fixedTimeStep;
             rateLimit = params.rateLimit;
 
             transferableMessage({ cmd: 'worldReady' });
+        });
     };
 
 })(self);

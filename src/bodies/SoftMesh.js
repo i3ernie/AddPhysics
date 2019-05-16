@@ -4,21 +4,33 @@
  * and open the template in the editor.
  */
 
+'use strict';
+
 import { Mesh, PhysicsBody } from './PhysiMesh.js';
 import * as THREE from "../three.module.js";
+import BufferGeometryUtils from "../utils/BufferGeometryUtils.js"
 
-_make = function( mesh, opt ){
+let _make = function( mesh, opt ){
     let obj = processGeometry( mesh.geometry );
     
     this._physijs.type = 'soft';
     this._physijs.ammoVertices = obj.ammoVertices;
     this._physijs.ammoIndices = obj.ammoIndices;
-    this._physijs.ammoIndexAssociation = obj.ammoIndexAssociation;    
+    this._physijs.ammoIndexAssociation = obj.ammoIndexAssociation; 
+    this._physijs.mass = opt.mass;
+    this._physijs.pressure = opt.pressure;
 };
 
 let Body = function( mesh, opt){
     
 };
+
+function isEqual( x1, y1, z1, x2, y2, z2 ) {
+        var delta = 0.000001;
+        return Math.abs( x2 - x1 ) < delta &&
+                        Math.abs( y2 - y1 ) < delta &&
+                        Math.abs( z2 - z1 ) < delta;
+}
 
 function processGeometry( bufGeometry ) {
     // Ony consider the position values when merging the vertices
@@ -26,7 +38,7 @@ function processGeometry( bufGeometry ) {
     posOnlyBufGeometry.addAttribute( 'position', bufGeometry.getAttribute( 'position' ) );
     posOnlyBufGeometry.setIndex( bufGeometry.getIndex() );
     // Merge the vertices so the triangle soup is converted to indexed triangles
-    var indexedBufferGeom = THREE.BufferGeometryUtils.mergeVertices( posOnlyBufGeometry );
+    var indexedBufferGeom = BufferGeometryUtils.mergeVertices( posOnlyBufGeometry );
     // Create index arrays mapping the indexed vertices to bufGeometry vertices
     let ret = mapIndices( bufGeometry, indexedBufferGeom );
     return ret;
@@ -44,18 +56,20 @@ function processGeometry( bufGeometry ) {
             ret.ammoVertices = idxVertices;
             ret.ammoIndices = indices;
             ret.ammoIndexAssociation = [];
+            
             for ( let i = 0; i < numIdxVertices; i ++ ) {
-                    var association = [];
-                    ret.ammoIndexAssociation.push( association );
-                    var i3 = i * 3;
-                    for ( let j = 0; j < numVertices; j ++ ) {
-                            var j3 = j * 3;
-                            if ( isEqual( idxVertices[ i3 ], idxVertices[ i3 + 1 ], idxVertices[ i3 + 2 ],
-                                    vertices[ j3 ], vertices[ j3 + 1 ], vertices[ j3 + 2 ] ) ) {
-                                    association.push( j3 );
-                            }
+                var association = [];
+                ret.ammoIndexAssociation.push( association );
+                var i3 = i * 3;
+                for ( let j = 0; j < numVertices; j ++ ) {
+                    var j3 = j * 3;
+                    if ( isEqual( idxVertices[ i3 ], idxVertices[ i3 + 1 ], idxVertices[ i3 + 2 ],
+                            vertices[ j3 ], vertices[ j3 + 1 ], vertices[ j3 + 2 ] ) ) {
+                            association.push( j3 );
                     }
+                }
             }
+        return ret;
     }
 
 let SoftMesh = function( geometry, material, mass, pressure ){

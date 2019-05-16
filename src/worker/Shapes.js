@@ -32,7 +32,12 @@
 	var cache_key, shape;
 
 	_transform.setIdentity();
+        
 	switch ( description.type ) {
+                case 'soft':
+			console.log("******* add soft");
+                        shape = createSoftShape( description );
+			break;
 		case 'plane':
 			cache_key = 'plane_' + description.normal.x + '_' + description.normal.y + '_' + description.normal.z;
 			if ( ( shape = getShapeFromCache( cache_key ) ) === null ) {
@@ -50,7 +55,7 @@
 				_vec3_1.setX(description.width / 2);
 				_vec3_1.setY(description.height / 2);
 				_vec3_1.setZ(description.depth / 2);
-				shape = new Ammo.btBoxShape(_vec3_1);
+				shape = new Ammo.btBoxShape( _vec3_1 );
 				setShapeCache( cache_key, shape );
 			}
 			break;
