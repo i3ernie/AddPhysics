@@ -93,7 +93,6 @@
             } else {
                 world = new Ammo.btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration );
             }
-            
 
             fixedTimeStep = params.fixedTimeStep;
             rateLimit = params.rateLimit;

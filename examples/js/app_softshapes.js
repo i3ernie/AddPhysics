@@ -43,6 +43,7 @@ Physijs.scripts.ammo = '../examples/js/ammolib.js';
             scene = new THREE.Scene();
 
             physicsWorld = Physijs.PhysicsWorld.addPhysics( scene, { 
+                type : "soft",
                 fixedTimeStep: 1 / 120, 
                 gravity : new THREE.Vector3( 0, -30, 0 ) 
             });

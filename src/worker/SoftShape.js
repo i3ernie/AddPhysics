@@ -8,6 +8,7 @@
     
     let Ammo;
     let softBodyHelpers;
+    let margin = 0.05;
     
     self.addEventListener("init", function( event ){ 
         Ammo = self.Ammo;
