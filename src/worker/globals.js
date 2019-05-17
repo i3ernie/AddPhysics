@@ -220,39 +220,39 @@ public_functions.setCcdSweptSphereRadius = function ( details ) {
 
 
 
-public_functions.simulate = function simulate( params ) {
-	if ( world ) {
-		params = params || {};
+public_functions.simulate = function simulate( params ) { 
+    if ( world ) {
+        params = params || {};
 
-		if ( !params.timeStep ) {
-			if ( last_simulation_time ) {
-				params.timeStep = 0;
-				while ( params.timeStep + last_simulation_duration <= fixedTimeStep ) {
-					params.timeStep = ( Date.now() - last_simulation_time ) / 1000; // time since last simulation
-				}
-			} else {
-				params.timeStep = fixedTimeStep; // handle first frame
-			}
-		} else {
-			if ( params.timeStep < fixedTimeStep ) {
-				params.timeStep = fixedTimeStep;
-			}
-		}
+        if ( !params.timeStep ) {
+                if ( last_simulation_time ) {
+                        params.timeStep = 0;
+                        while ( params.timeStep + last_simulation_duration <= fixedTimeStep ) {
+                                params.timeStep = ( Date.now() - last_simulation_time ) / 1000; // time since last simulation
+                        }
+                } else {
+                        params.timeStep = fixedTimeStep; // handle first frame
+                }
+        } else {
+                if ( params.timeStep < fixedTimeStep ) {
+                        params.timeStep = fixedTimeStep;
+                }
+        }
 
-		params.maxSubSteps = params.maxSubSteps || Math.ceil( params.timeStep / fixedTimeStep ); // If maxSubSteps is not defined, keep the simulation fully up to date
+        params.maxSubSteps = params.maxSubSteps || Math.ceil( params.timeStep / fixedTimeStep ); // If maxSubSteps is not defined, keep the simulation fully up to date
 
-		last_simulation_duration = Date.now();
-		world.stepSimulation( params.timeStep, params.maxSubSteps, fixedTimeStep );
+        last_simulation_duration = Date.now();
+        world.stepSimulation( params.timeStep, params.maxSubSteps, fixedTimeStep );
 
-		self.dispatchEvent( new CustomEvent("report", {
-                    detail: {
-                        worker: self
-                    }
-                }) );
-                
-		last_simulation_duration = ( Date.now() - last_simulation_duration ) / 1000;
-		last_simulation_time = Date.now();
-	}
+        self.dispatchEvent( new CustomEvent("report", {
+            detail: {
+                worker: self
+            }
+        }) );
+
+        last_simulation_duration = ( Date.now() - last_simulation_duration ) / 1000;
+        last_simulation_time = Date.now();
+    }
 };
 
 self.onmessage = function( event ) {

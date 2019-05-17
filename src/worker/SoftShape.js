@@ -17,7 +17,7 @@
     
     
     self.createSoftShape = function( description ){
-        var volumeSoftBody = softBodyHelpers.CreateFromTriMesh(
+        let volumeSoftBody = softBodyHelpers.CreateFromTriMesh(
             world.getWorldInfo(),
             description.ammoVertices,
             description.ammoIndices,
@@ -25,7 +25,7 @@
             true );
     
     
-        var sbConfig = volumeSoftBody.get_m_cfg();
+        let sbConfig = volumeSoftBody.get_m_cfg();
         sbConfig.set_viterations( 40 );
         sbConfig.set_piterations( 40 );
         // Soft-soft and soft-rigid collisions
@@ -39,6 +39,7 @@
         // Stiffness
         volumeSoftBody.get_m_materials().at( 0 ).set_m_kLST( 0.9 );
         volumeSoftBody.get_m_materials().at( 0 ).set_m_kAST( 0.9 );
+        
         volumeSoftBody.setTotalMass( description.mass, false );
         Ammo.castObject( volumeSoftBody, Ammo.btCollisionObject ).getCollisionShape().setMargin( margin );
         return volumeSoftBody;

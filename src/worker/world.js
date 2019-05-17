@@ -64,50 +64,60 @@
             shape = compound_shape;
             _compound_shapes[ description.id ] = shape;
 	}
-	_vec3_1.setX(0);
-	_vec3_1.setY(0);
-	_vec3_1.setZ(0);
-	shape.calculateLocalInertia( description.mass, _vec3_1 );
+        
+        if ( description.type === "soft" ){ 
+            world.addSoftBody( shape, 1, - 1 );
+            shape.setActivationState( 4 );
+        } else {
+	
+            _vec3_1.setX(0);
+            _vec3_1.setY(0);
+            _vec3_1.setZ(0);
 
-	_transform.setIdentity();
+            shape.calculateLocalInertia( description.mass, _vec3_1 );
 
-	_vec3_2.setX(description.position.x);
-	_vec3_2.setY(description.position.y);
-	_vec3_2.setZ(description.position.z);
-	_transform.setOrigin(_vec3_2);
+            _transform.setIdentity();
 
-	_quat.setX(description.rotation.x);
-	_quat.setY(description.rotation.y);
-	_quat.setZ(description.rotation.z);
-	_quat.setW(description.rotation.w);
-	_transform.setRotation(_quat);
+            _vec3_2.setX( description.position.x );
+            _vec3_2.setY( description.position.y );
+            _vec3_2.setZ( description.position.z );
+            _transform.setOrigin(_vec3_2);
 
-	motionState = new Ammo.btDefaultMotionState( _transform ); // #TODO: btDefaultMotionState supports center of mass offset as second argument - implement
-	rbInfo = new Ammo.btRigidBodyConstructionInfo( description.mass, motionState, shape, _vec3_1 );
+            _quat.setX(description.rotation.x);
+            _quat.setY(description.rotation.y);
+            _quat.setZ(description.rotation.z);
+            _quat.setW(description.rotation.w);
+            _transform.setRotation(_quat);
+        
 
-	if ( description.materialId !== undefined ) {
-		rbInfo.set_m_friction( _materials[ description.materialId ].friction );
-		rbInfo.set_m_restitution( _materials[ description.materialId ].restitution );
-	}
+            motionState = new Ammo.btDefaultMotionState( _transform ); // #TODO: btDefaultMotionState supports center of mass offset as second argument - implement
+            rbInfo = new Ammo.btRigidBodyConstructionInfo( description.mass, motionState, shape, _vec3_1 );
 
-	body = new Ammo.btRigidBody( rbInfo );
-	Ammo.destroy(rbInfo);
+            if ( description.materialId !== undefined ) {
+                    rbInfo.set_m_friction( _materials[ description.materialId ].friction );
+                    rbInfo.set_m_restitution( _materials[ description.materialId ].restitution );
+            }
 
-	if ( typeof description.collision_flags !== 'undefined' ) {
-		body.setCollisionFlags( description.collision_flags );
-	}
+            body = new Ammo.btRigidBody( rbInfo );
+            Ammo.destroy(rbInfo);
+        
 
-	world.addRigidBody( body );
+            if ( typeof description.collision_flags !== 'undefined' ) {
+                    body.setCollisionFlags( description.collision_flags );
+            }
 
-	body.id = description.id;
-	_objects[ body.id ] = body;
-	_motion_states[ body.id ] = motionState;
+            world.addRigidBody( body );
+       
+            body.id = description.id;
+            _objects[ body.id ] = body;
+            _motion_states[ body.id ] = motionState;
 
-	var ptr = body.a != undefined ? body.a : body.ptr;
-	_objects_ammo[ptr] = body.id;
-	_num_objects++;
+            var ptr = body.a != undefined ? body.a : body.ptr;
+            _objects_ammo[ptr] = body.id;
+            _num_objects++;
 
-	transferableMessage({ cmd: 'objectReady', params: body.id });
+            transferableMessage({ cmd: 'objectReady', params: body.id });
+        }
     };
     
     public_functions.removeObject = function( details ) {

@@ -29,13 +29,12 @@
     };
     
     self.createShape = function( description ) {
-	var cache_key, shape;
+	let cache_key, shape;
 
 	_transform.setIdentity();
         
 	switch ( description.type ) {
                 case 'soft':
-			console.log("******* add soft");
                         shape = createSoftShape( description );
 			break;
 		case 'plane':
@@ -132,8 +131,9 @@
 			break;
 
 		case 'convex':
-			var i, point, shape = new Ammo.btConvexHullShape;
-			for ( i = 0; i < description.points.length; i++ ) {
+			let point; 
+                        shape = new Ammo.btConvexHullShape;
+			for ( let i = 0; i < description.points.length; i++ ) {
 				point = description.points[i];
 
 				_vec3_1.setX(point.x);
