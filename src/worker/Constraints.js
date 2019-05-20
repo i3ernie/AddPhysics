@@ -7,13 +7,7 @@
 (function( self ){
     
     self._constraints = {};
-    self._num_constraints = 0;
-    
-    let reportConstraints;
-    
-    self.addEventListener("report", function( event ){ 
-        reportConstraints();
-    });
+    self._num_constraints = 0;   
     
     public_functions.addConstraint = function ( details ) {
 	var constraint;
@@ -54,7 +48,7 @@
             }
     };
 
-    reportConstraints = function() {
+    self.addEventListener("report", function( event ){ 
             var index, constraint,
                     offset_body,
                     transform, origin,
@@ -99,6 +93,6 @@
                     }
             }
 
-    };
+    });
 
 })(self);

@@ -82,6 +82,40 @@ let VehicleTuning = function( suspension_stiffness, suspension_compression, susp
         this.friction_slip = friction_slip !== undefined ? friction_slip : 10.5;
         this.max_suspension_force = max_suspension_force !== undefined ? max_suspension_force : 6000;
 };
-        
+/*
+    _updateVehicles = function( data ) {
+            var vehicle, wheel,
+                    i, offset;
+
+            for ( i = 0; i < ( data.length - 1 ) / VEHICLEREPORT_ITEMSIZE; i++ ) {
+                    offset = 1 + i * VEHICLEREPORT_ITEMSIZE;
+                    vehicle = this._vehicles[ data[ offset ] ];
+
+                    if ( vehicle === undefined ) {
+                            continue;
+                    }
+
+                    wheel = vehicle.wheels[ data[ offset + 1 ] ];
+
+                    wheel.position.set(
+                            data[ offset + 2 ],
+                            data[ offset + 3 ],
+                            data[ offset + 4 ]
+                    );
+
+                    wheel.quaternion.set(
+                            data[ offset + 5 ],
+                            data[ offset + 6 ],
+                            data[ offset + 7 ],
+                            data[ offset + 8 ]
+                    );
+            }
+
+            if ( SUPPORT_TRANSFERABLE ) {
+                    // Give the typed array back to the worker
+                    this._worker.transferableMessage( data.buffer, [data.buffer] );
+            }
+    };
+        */
 export { Vehicle, VehicleTuning };
 

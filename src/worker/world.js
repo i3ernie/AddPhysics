@@ -66,8 +66,7 @@
 	}
         
         if ( description.type === "soft" ){ 
-            world.addSoftBody( shape, 1, - 1 );
-            shape.setActivationState( 4 );
+            addSoftShape( description, shape );
         } else {
 	
             _vec3_1.setX(0);
@@ -121,18 +120,22 @@
     };
     
     public_functions.removeObject = function( details ) {
-            world.removeRigidBody( _objects[details.id] );
-            Ammo.destroy(_objects[details.id]);
-            Ammo.destroy(_motion_states[details.id]);
-        if (_compound_shapes[details.id]) Ammo.destroy(_compound_shapes[details.id]);
-            if (_noncached_shapes[details.id]) Ammo.destroy(_noncached_shapes[details.id]);
-            var ptr = _objects[details.id].a != undefined ? _objects[details.id].a : _objects[details.id].ptr;
-            delete _objects_ammo[ptr];
-            delete _objects[details.id];
-            delete _motion_states[details.id];
-        if (_compound_shapes[details.id]) delete _compound_shapes[details.id];
-            if (_noncached_shapes[details.id]) delete _noncached_shapes[details.id];
-            _num_objects--;
+        if ( description.type === "soft" ){ 
+            removeSoftShape( details );
+        } else {
+                world.removeRigidBody( _objects[details.id] );
+                Ammo.destroy(_objects[details.id]);
+                Ammo.destroy(_motion_states[details.id]);
+            if (_compound_shapes[details.id]) Ammo.destroy(_compound_shapes[details.id]);
+                if (_noncached_shapes[details.id]) Ammo.destroy(_noncached_shapes[details.id]);
+                var ptr = _objects[details.id].a != undefined ? _objects[details.id].a : _objects[details.id].ptr;
+                delete _objects_ammo[ptr];
+                delete _objects[details.id];
+                delete _motion_states[details.id];
+            if (_compound_shapes[details.id]) delete _compound_shapes[details.id];
+                if (_noncached_shapes[details.id]) delete _noncached_shapes[details.id];
+                _num_objects--;
+        }
     };
     
     reportWorld = function() {

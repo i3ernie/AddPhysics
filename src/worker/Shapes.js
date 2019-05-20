@@ -97,7 +97,7 @@
 
 		case 'concave':
 			var i, triangle, triangle_mesh = new Ammo.btTriangleMesh;
-			if (!description.triangles.length) return false
+			if (!description.triangles.length) return false;
 
 			for ( i = 0; i < description.triangles.length; i++ ) {
 				triangle = description.triangles[i];

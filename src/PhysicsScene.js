@@ -13,7 +13,8 @@ const MESSAGE_TYPES = {
         WORLDREPORT: 0,
         COLLISIONREPORT: 1,
         VEHICLEREPORT: 2,
-        CONSTRAINTREPORT: 3
+        CONSTRAINTREPORT: 3,
+        SOFTBODYREPORT :4
 };
 const  REPORT_ITEMSIZE = 14,
     COLLISIONREPORT_ITEMSIZE = 5,
@@ -81,8 +82,8 @@ const PhysicsWorld = function( scene, params ){
         SUPPORT_TRANSFERABLE = ( ab.byteLength === 0 );
 
         this._worker.onmessage = function ( event ) {
-                var _temp,
-                        data = event.data;
+                let _temp;
+                let data = event.data;
 
                 if ( data instanceof ArrayBuffer && data.byteLength !== 1 ) { // byteLength === 1 is the worker making a SUPPORT_TRANSFERABLE test
                         data = new Float32Array( data );
@@ -154,6 +155,10 @@ const PhysicsWorld = function( scene, params ){
 
                                         case MESSAGE_TYPES.CONSTRAINTREPORT:
                                                 self._updateConstraints( data );
+                                                break;
+                                                
+                                        case MESSAGE_TYPES.SOFTBODYREPORT:
+                                                self._updateSoftBodies( data );
                                                 break;
                                 }
 
@@ -346,6 +351,39 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
 		_is_simulating = false;
 		this.dispatchEvent( {type : 'update'} );
 	},
+        
+        _updateSoftBodies : function( data ){
+            
+            let object = this._objects[ data[2] ];
+            let verts = data[3];
+           
+            let volumePositions = object.geometry.attributes.position.array;
+            let volumeNormals = object.geometry.attributes.normal.array;
+            let association = object._physijs.ammoIndexAssociation;
+            
+            for ( let i = 0; i < association.length; i ++ ) 
+            {    
+                let assocVertex = association[ i ];
+               
+                let offset = i*6;
+                
+                for ( let k = 0, kl = assocVertex.length; k < kl; k++ ) {
+                    let indexVertex = assocVertex[ k ];
+                    volumePositions[ indexVertex ] = verts[offset + 0];
+                    volumeNormals[ indexVertex ] = verts[offset + 3];
+                    indexVertex ++;
+                    volumePositions[ indexVertex ] = verts[offset + 1];
+                    volumeNormals[ indexVertex ] = verts[offset + 4];
+                    indexVertex ++;
+                    volumePositions[ indexVertex ] = verts[offset + 2];
+                    volumeNormals[ indexVertex ] = verts[offset + 5];
+                }
+            }
+            object.geometry.attributes.position.needsUpdate = true;
+            object.geometry.attributes.normal.needsUpdate = true;
+            
+        },
+        
         _updateVehicles : function( data ) {
 		var vehicle, wheel,
 			i, offset;

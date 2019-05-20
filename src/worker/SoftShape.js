@@ -9,6 +9,11 @@
     let Ammo;
     let softBodyHelpers;
     let margin = 0.05;
+    let _bodies = {};
+    let _descriptions = {};
+    let report = [];
+    
+    MESSAGE_TYPES.SOFTREPORT = 4;
     
     self.addEventListener("init", function( event ){ 
         Ammo = self.Ammo;
@@ -42,7 +47,74 @@
         
         volumeSoftBody.setTotalMass( description.mass, false );
         Ammo.castObject( volumeSoftBody, Ammo.btCollisionObject ).getCollisionShape().setMargin( margin );
+        volumeSoftBody.id = description.id;
+        
+        _descriptions[description.id] = { ammoIndexAssociation : description.ammoIndexAssociation };
+        
         return volumeSoftBody;
     };
+    
+    self.addSoftShape = function( description, shape ){ 
+        _bodies[description.id] =  shape;
+        world.addSoftBody( shape, 1, - 1 );
+        shape.setActivationState( 4 );
+    };
+    
+    self.removeSoftShape = function( details ){
+        //ToDo
+        delete _descriptions[details.id];
+    };
+    
+    self.addEventListener("report", function() {
+        
+        let offset, offsetv, softBody;
+        
+        let length = Object.keys(_bodies).length;
+        let i = 0;
+        
+        if ( length < 1) return;
+       
+        report = [];
+        report[0] = MESSAGE_TYPES.SOFTREPORT;
+        
+        report[1] = length;
+        
+        for ( index in _bodies ) {
+            if ( _bodies.hasOwnProperty( index ) ) {
+          
+                softBody = _bodies[ index ];
+
+                let association = _descriptions[ softBody.id ].ammoIndexAssociation;
+                let numVerts = association.length;
+                let nodes = softBody.get_m_nodes();
+
+                offset = 2 + (i++) * 2;
+
+                report[ offset ] = softBody.id;
+
+                let verts = new Float32Array( numVerts * 6 );
+                               
+                for ( let j = 0; j < numVerts; j ++ ) {
+                    let node = nodes.at( j );
+                    
+                    offsetv = j * 6;
+                    let nodePos = node.get_m_x();
+                  
+                    verts[ offsetv + 0 ] = nodePos.x();
+                    verts[ offsetv + 1 ] = nodePos.y();
+                    verts[ offsetv + 2 ] = nodePos.z();
+
+                    let nodeNormal = node.get_m_n();
+                    verts[ offsetv + 3 ] = nodeNormal.x();
+                    verts[ offsetv + 4 ] = nodeNormal.y();
+                    verts[ offsetv + 5 ] = nodeNormal.z();
+                   
+                }
+                report[ offset + 1 ] = verts;
+            }
+        }
+        
+	transferableMessage( report );
+    });
     
 })( self );
