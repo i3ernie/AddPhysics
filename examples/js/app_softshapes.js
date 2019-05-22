@@ -152,9 +152,10 @@ Physijs.scripts.ammo = '../examples/js/ammolib.js';
 	createShape = function() {
             var volumeMass = 15;
             let sphereGeometry = new THREE.SphereBufferGeometry( 1.5, 40, 25 );
+            sphereGeometry.translate( 0, 10, 0 );
             let mat = new THREE.MeshPhongMaterial( { color: 0xFFFFFF } );
             let shape = new Physijs.SoftMesh( sphereGeometry, mat, volumeMass, 250 );
-            shape.position.set( 0, 10, 0 );
+            //shape.position.set( 0, 10, 0 );
             scene.add( shape );
 		
 		
