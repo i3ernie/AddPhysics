@@ -3,6 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
+'use strict';
+
 (function( self ){
     
     let public_functions = self.public_functions;
