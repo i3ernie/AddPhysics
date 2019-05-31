@@ -12,9 +12,9 @@ importScripts( "./worker/SoftShape.js" );
 importScripts( "./worker/vehicle.js" );
 
 
-importScripts( "./worker/Constraints.js" );
-importScripts( "./worker/DOFConstraint.js" );
+importScripts( "./worker/constraints/Constraints.js" );
+importScripts( "./worker/constraints/DOFConstraint.js" );
 importScripts( "./worker/HingeConstraint.js" );
-importScripts( "./worker/SliderConstraint.js" );
-importScripts( "./worker/ConetwistConstraint.js" );
-importScripts( "./worker/PointConstraint.js" );
+importScripts( "./worker/constraints/SliderConstraint.js" );
+importScripts( "./worker/constraints/ConetwistConstraint.js" );
+importScripts( "./worker/constraints/PointConstraint.js" );
