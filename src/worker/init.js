@@ -12,7 +12,6 @@
             
         importScripts( params.ammo );
         
-        
         if (typeof Ammo !== "function"){
             AMMO = function(){ return {
                     then : function( fnc ){ fnc( Ammo ); }
@@ -56,43 +55,58 @@
             collisionreport[0] = MESSAGE_TYPES.COLLISIONREPORT;
             vehiclereport[0] = MESSAGE_TYPES.VEHICLEREPORT;
             constraintreport[0] = MESSAGE_TYPES.CONSTRAINTREPORT;
-
-            let collisionConfiguration = new Ammo.btDefaultCollisionConfiguration,
-                    dispatcher = new Ammo.btCollisionDispatcher( collisionConfiguration ),
-                    solver = new Ammo.btSequentialImpulseConstraintSolver,
-                    broadphase;
-
-            if ( !params.broadphase ) params.broadphase = { type: 'dynamic' };
-            switch ( params.broadphase.type ) {
+            
+           
+            
+            if ( params.type === "soft" ) {
+                let collisionConfiguration = new Ammo.btSoftBodyRigidBodyCollisionConfiguration();
+                
+                world = new Ammo.btSoftRigidDynamicsWorld( 
+                    new Ammo.btCollisionDispatcher( collisionConfiguration ), 
+                    new Ammo.btDbvtBroadphase(), 
+                    new Ammo.btSequentialImpulseConstraintSolver(), 
+                    collisionConfiguration, 
+                    new Ammo.btDefaultSoftBodySolver() 
+                );
+                
+            } else {
+                 
+                let collisionConfiguration = new Ammo.btDefaultCollisionConfiguration;                
+                let broadphase;
+              
+                params.broadphase = params.broadphase || { type: 'dynamic' };
+                
+                switch ( params.broadphase.type ) {
                     case 'sweepprune':
 
-                            _vec3_1.setX(params.broadphase.aabbmin.x);
-                            _vec3_1.setY(params.broadphase.aabbmin.y);
-                            _vec3_1.setZ(params.broadphase.aabbmin.z);
+                        _vec3_1.setX(params.broadphase.aabbmin.x);
+                        _vec3_1.setY(params.broadphase.aabbmin.y);
+                        _vec3_1.setZ(params.broadphase.aabbmin.z);
 
-                            _vec3_2.setX(params.broadphase.aabbmax.x);
-                            _vec3_2.setY(params.broadphase.aabbmax.y);
-                            _vec3_2.setZ(params.broadphase.aabbmax.z);
+                        _vec3_2.setX(params.broadphase.aabbmax.x);
+                        _vec3_2.setY(params.broadphase.aabbmax.y);
+                        _vec3_2.setZ(params.broadphase.aabbmax.z);
 
-                            broadphase = new Ammo.btAxisSweep3(
-                                    _vec3_1,
-                                    _vec3_2
-                            );
+                        broadphase = new Ammo.btAxisSweep3(
+                                _vec3_1,
+                                _vec3_2
+                        );
 
-                            break;
+                        break;
 
                     case 'dynamic':
                     default:
-                            broadphase = new Ammo.btDbvtBroadphase;
-                            break;
+                        broadphase = new Ammo.btDbvtBroadphase();
+                        break;
+                }
+                world = new Ammo.btDiscreteDynamicsWorld( 
+                    new Ammo.btCollisionDispatcher( collisionConfiguration ), 
+                    broadphase, 
+                    new Ammo.btSequentialImpulseConstraintSolver(), 
+                    collisionConfiguration 
+                );
             }
             
-            if ( params.type === "soft" ) {
-                let softBodySolver = new Ammo.btDefaultSoftBodySolver();
-                world = new Ammo.btSoftRigidDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration, softBodySolver );
-            } else {
-                world = new Ammo.btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration );
-            }
 
             fixedTimeStep = params.fixedTimeStep;
             rateLimit = params.rateLimit;

@@ -21,11 +21,11 @@
         reportWorld();
     });
     
-    public_functions.setGravity = function( description ) {
-	_vec3_1.setX( description.x );
-	_vec3_1.setY( description.y );
-	_vec3_1.setZ( description.z );
-	world.setGravity( _vec3_1 );
+    public_functions.setGravity = function( description ) { 
+        console.log( description );
+        let vecGravity = new Ammo.btVector3( description.x || 0, description.y, description.z || 0 );
+	world.setGravity( vecGravity );
+        world.getWorldInfo().set_m_gravity( vecGravity );
     };
     
     public_functions.addObject = function( description ) {

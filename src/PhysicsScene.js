@@ -354,33 +354,48 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
         
         _updateSoftBodies : function( data ){
             
-            let object = this._objects[ data[2] ];
-            let verts = data[3];
-           
-            let volumePositions = object.geometry.attributes.position.array;
-            let volumeNormals = object.geometry.attributes.normal.array;
-            let association = object._physijs.ammoIndexAssociation;
+            const length = data[1];
             
-            for ( let i = 0; i < association.length; i ++ ) 
-            {    
-                let assocVertex = association[ i ];
-               
-                let offset = i*6;
+            let object;
+            let numVerts;
+            
+            let offset =2;
+            
+            for ( var i = 0, il = length; i < il; i ++ ) {
                 
-                for ( let k = 0, kl = assocVertex.length; k < kl; k++ ) {
-                    let indexVertex = assocVertex[ k ];
-                    volumePositions[ indexVertex ] = verts[offset + 0];
-                    volumeNormals[ indexVertex ] = verts[offset + 3];
-                    indexVertex ++;
-                    volumePositions[ indexVertex ] = verts[offset + 1];
-                    volumeNormals[ indexVertex ] = verts[offset + 4];
-                    indexVertex ++;
-                    volumePositions[ indexVertex ] = verts[offset + 2];
-                    volumeNormals[ indexVertex ] = verts[offset + 5];
+                object = this._objects[ data[offset] ];
+                offset += 1;
+                
+                
+                let volumePositions = object.geometry.attributes.position.array;
+                let volumeNormals = object.geometry.attributes.normal.array;
+                let association = object._physijs.ammoIndexAssociation;
+                
+                numVerts = data[offset];
+
+                for ( let j = 0; j < numVerts; j ++ ) {
+                    let assocVertex = association[ j ];
+
+                    for ( let k = 0, kl = assocVertex.length; k < kl; k ++ ) {
+
+                            var indexVertex = assocVertex[ k ];
+                            volumePositions[ indexVertex ] = data[offset+1];
+                            volumeNormals[ indexVertex ] = data[offset+4];
+                            indexVertex ++;
+                            volumePositions[ indexVertex ] = data[offset+2];
+                            volumeNormals[ indexVertex ] = data[offset+5];
+                            indexVertex ++;
+                            volumePositions[ indexVertex ] = data[offset+3];
+                            volumeNormals[ indexVertex ] = data[offset+6];
+
+                    }
+                    offset += 6;
                 }
+                offset += 1;
+
+                object.geometry.attributes.position.needsUpdate = true;
+                object.geometry.attributes.normal.needsUpdate = true;
             }
-            object.geometry.attributes.position.needsUpdate = true;
-            object.geometry.attributes.normal.needsUpdate = true;
             
         },
         
