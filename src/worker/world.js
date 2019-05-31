@@ -25,7 +25,12 @@
         console.log( description );
         let vecGravity = new Ammo.btVector3( description.x || 0, description.y, description.z || 0 );
 	world.setGravity( vecGravity );
-        world.getWorldInfo().set_m_gravity( vecGravity );
+        try {
+            world.getWorldInfo().set_m_gravity( vecGravity );
+        } 
+        catch( e ){
+            
+        }
     };
     
     public_functions.addObject = function( description ) {
