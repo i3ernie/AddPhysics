@@ -24,10 +24,12 @@ let PhysicsBody = function( mesh, opt ){
 
     
     mesh.addEventListener("added", function(){
+        this.physicsBody.scene = this.parent;
         this.parent.dispatchEvent({type:"physicsBodyAdded", object:this});
     });
-    mesh.addEventListener("removed", function(){
-        this.parent.dispatchEvent({type:"physicsBodyRemoved", object:this});
+    mesh.addEventListener("removed", function( el ){ 
+        this.physicsBody.scene.dispatchEvent({type:"physicsBodyRemoved", object:this});
+        this.physicsBody.scene = null;
     });
  
     this._physijs = {

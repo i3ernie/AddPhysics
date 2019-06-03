@@ -3,7 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-import * as THREE from '../../../../src/three.module.js';
+import {THREE} from "../../../dist/THREEAddPhysics.module.js";
 
 let LegacyJSONLoader = function ( manager ) {
 

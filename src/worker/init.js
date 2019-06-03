@@ -10,7 +10,7 @@
     
     public_functions.init = function( params ) {
             
-        importScripts( params.ammo );
+        if ( !self.Ammo ) importScripts( params.ammo );
         
         if (typeof Ammo !== "function"){
             AMMO = function(){ return {

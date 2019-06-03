@@ -6,17 +6,16 @@
 	<title>Memory Test - Physijs</title>
 	
 	<link rel="stylesheet" type="text/css" href="css/styles.css" />
-	
-	<script type="text/javascript" src="js/three.min.js"></script>
-	<script type="text/javascript" src="js/stats.js"></script>
-	<script type="text/javascript" src="../physi.js"></script>
-	
-	<script type="text/javascript">
+
+	<script type="module">
 	
 	'use strict';
 	
-	Physijs.scripts.worker = '../physijs_worker.js';
-	Physijs.scripts.ammo = 'examples/js/ammo.js';
+	import {Physijs, THREE} from "../dist/THREEAddPhysics.es.js";
+        import Stats from "./js/stats.module.js";
+	
+	Physijs.scripts.worker = '../dist/AddPhysicsWorkerAmmo.js';
+
 	
 	var initScene, render, _boxes = [], spawnBox, inc_ready, renderer, render_stats, physics_stats, scene, ground_material, ground, light, loader, camera;
 

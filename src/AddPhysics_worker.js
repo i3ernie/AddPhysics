@@ -14,7 +14,7 @@ importScripts( "./worker/vehicle.js" );
 
 importScripts( "./worker/constraints/Constraints.js" );
 importScripts( "./worker/constraints/DOFConstraint.js" );
-importScripts( "./worker/HingeConstraint.js" );
+importScripts( "./worker/constraints/HingeConstraint.js" );
 importScripts( "./worker/constraints/SliderConstraint.js" );
 importScripts( "./worker/constraints/ConetwistConstraint.js" );
 importScripts( "./worker/constraints/PointConstraint.js" );

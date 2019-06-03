@@ -231,7 +231,7 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
     onRemove : function( object ) {
         
         let _physijs = object.physicsBody._physijs;
-        
+       
         if ( object instanceof Vehicle ) {
             this.execute( 'removeVehicle', { id: _physijs.id } );
             while( object.wheels.length ) {
@@ -239,8 +239,7 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
             }
             this.remove( object.mesh );
             delete this._vehicles[ _physijs.id ];
-        } else {
-                THREE.Mesh.prototype.remove.call( this, object );
+        } else {  
                 if ( _physijs ) {
                         delete this._objects[_physijs.id];
                         this.execute( 'removeObject', { id: _physijs.id } );
@@ -306,11 +305,12 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
 		for ( i = 0; i < num_objects; i++ ) {
 			offset = 2 + i * REPORT_ITEMSIZE;
 			object = this._objects[ data[ offset ] ];
-                        _physijs = object.physicsBody._physijs;
 
 			if ( object === undefined ) {
 				continue;
 			}
+                        
+                        _physijs = object.physicsBody._physijs;
 
 			if ( object.physicsBody.__dirtyPosition === false ) {
 				object.position.set(

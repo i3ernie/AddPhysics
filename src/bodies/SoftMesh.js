@@ -19,17 +19,28 @@ let _make = function( mesh, opt ){
     this._physijs.ammoIndexAssociation = obj.ammoIndexAssociation; 
     this._physijs.mass = opt.mass;
     this._physijs.pressure = opt.pressure;
+  
 };
 
-let Body = function( mesh, opt){
-    
+let Body = function( mesh, opt ){
+    const mass = opt.mass || null;
+    PhysicsBody.call( this, mesh, opt );
+    _make.call( this, mesh, { mass: mass, pressure: opt.pressure } );
+};
+
+Body.prototype = Object.assign({}, PhysicsBody.prototype, {
+    constructor : Body
+});
+
+Body.addPhysics = function( mesh, opt ){
+    PhysicsBody.add( Body, mesh, opt );
 };
 
 function isEqual( x1, y1, z1, x2, y2, z2 ) {
-        var delta = 0.000001;
-        return Math.abs( x2 - x1 ) < delta &&
-                        Math.abs( y2 - y1 ) < delta &&
-                        Math.abs( z2 - z1 ) < delta;
+    const delta = 0.000001;
+    return Math.abs( x2 - x1 ) < delta 
+            && Math.abs( y2 - y1 ) < delta 
+            && Math.abs( z2 - z1 ) < delta;
 }
 
 function processGeometry( bufGeometry ) {

@@ -23,6 +23,7 @@ import BufferGeometryUtils from "../../src/utils/BufferGeometryUtils.js";
 			var ballMaterial = new THREE.MeshPhongMaterial( { color: 0x202020 } );
 			var pos = new THREE.Vector3();
 			var quat = new THREE.Quaternion();
+                        let report = null;
 
 			// Physics variables
 			var gravityConstant = - 9.8;
@@ -119,6 +120,7 @@ import BufferGeometryUtils from "../../src/utils/BufferGeometryUtils.js";
 				var broadphase = new Ammo.btDbvtBroadphase();
 				var solver = new Ammo.btSequentialImpulseConstraintSolver();
 				var softBodySolver = new Ammo.btDefaultSoftBodySolver();
+                                
 				physicsWorld = new Ammo.btSoftRigidDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration, softBodySolver );
 				physicsWorld.setGravity( new Ammo.btVector3( 0, gravityConstant, 0 ) );
 				physicsWorld.getWorldInfo().set_m_gravity( new Ammo.btVector3( 0, gravityConstant, 0 ) );
@@ -133,7 +135,10 @@ import BufferGeometryUtils from "../../src/utils/BufferGeometryUtils.js";
 				// Ground
 				pos.set( 0, - 0.5, 0 );
 				quat.set( 0, 0, 0, 1 );
-				var ground = createParalellepiped( 40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
+                                
+                                var threeObject = new Physijs.BoxMesh( new THREE.BoxBufferGeometry( 40, 1, 40, 1, 1, 1 ), new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ), 0 );
+				
+                            var ground = createParalellepiped( threeObject, pos, quat );
 				ground.castShadow = true;
 				ground.receiveShadow = true;
 				textureLoader.load( "textures/grid.png", function ( texture ) {
@@ -151,8 +156,9 @@ import BufferGeometryUtils from "../../src/utils/BufferGeometryUtils.js";
 
 				var sphereGeometry = new THREE.SphereBufferGeometry( 1.5, 40, 25 );
 				sphereGeometry.translate( 5, 5, 0 );
-				createSoftVolume( sphereGeometry, volumeMass, 250 );
-                                // = new Physijs.SoftMesh( sphereGeometry, mat, volumeMass, 250 );
+				
+                            
+                                createSoftVolume( sphereGeometry, volumeMass, 250 );
 
 				var boxGeometry = new THREE.BoxBufferGeometry( 1, 1, 5, 4, 4, 20 );
 				boxGeometry.translate( - 2, 5, 0 );
@@ -161,98 +167,45 @@ import BufferGeometryUtils from "../../src/utils/BufferGeometryUtils.js";
 				// Ramp
 				pos.set( 3, 1, 0 );
 				quat.setFromAxisAngle( new THREE.Vector3( 0, 0, 1 ), 30 * Math.PI / 180 );
-				var obstacle = createParalellepiped( 10, 1, 4, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0x606060 } ) );
+                                threeObject = new Physijs.BoxMesh( new THREE.BoxBufferGeometry( 10, 1, 4, 1, 1, 1 ), new THREE.MeshPhongMaterial( { color: 0x606060 } ), 0 );
+				var obstacle = createParalellepiped( threeObject, pos, quat );
 				obstacle.castShadow = true;
 				obstacle.receiveShadow = true;
 
 			}
 
-			function processGeometry( bufGeometry ) {
 
-				// Ony consider the position values when merging the vertices
-				var posOnlyBufGeometry = new THREE.BufferGeometry();
-				posOnlyBufGeometry.addAttribute( 'position', bufGeometry.getAttribute( 'position' ) );
-				posOnlyBufGeometry.setIndex( bufGeometry.getIndex() );
-
-				// Merge the vertices so the triangle soup is converted to indexed triangles
-				var indexedBufferGeom = BufferGeometryUtils.mergeVertices( posOnlyBufGeometry );
-
-				// Create index arrays mapping the indexed vertices to bufGeometry vertices
-				mapIndices( bufGeometry, indexedBufferGeom );
-
-			}
-
-			function isEqual( x1, y1, z1, x2, y2, z2 ) {
-
-				var delta = 0.000001;
-				return Math.abs( x2 - x1 ) < delta &&
-						Math.abs( y2 - y1 ) < delta &&
-						Math.abs( z2 - z1 ) < delta;
-
-			}
-
-			function mapIndices( bufGeometry, indexedBufferGeom ) {
-
-				// Creates ammoVertices, ammoIndices and ammoIndexAssociation in bufGeometry
-
-				var vertices = bufGeometry.attributes.position.array;
-				var idxVertices = indexedBufferGeom.attributes.position.array;
-				var indices = indexedBufferGeom.index.array;
-
-				var numIdxVertices = idxVertices.length / 3;
-				var numVertices = vertices.length / 3;
-
-				bufGeometry.ammoVertices = idxVertices;
-				bufGeometry.ammoIndices = indices;
-				bufGeometry.ammoIndexAssociation = [];
-
-				for ( var i = 0; i < numIdxVertices; i ++ ) {
-
-					var association = [];
-					bufGeometry.ammoIndexAssociation.push( association );
-
-					var i3 = i * 3;
-
-					for ( var j = 0; j < numVertices; j ++ ) {
-
-						var j3 = j * 3;
-						if ( isEqual( idxVertices[ i3 ], idxVertices[ i3 + 1 ], idxVertices[ i3 + 2 ],
-							vertices[ j3 ], vertices[ j3 + 1 ], vertices[ j3 + 2 ] ) ) {
-
-							association.push( j3 );
-
-						}
-
-					}
-
-				}
-
-			}
+			
 
 			function createSoftVolume( bufferGeom, mass, pressure ) {
 
-				processGeometry( bufferGeom );
+                                
+                            let mat = new THREE.MeshPhongMaterial( { color: 0xFFFFFF } );
+                            textureLoader.load( "textures/colors.png", function ( texture ) {
 
-				var volume = new THREE.Mesh( bufferGeom, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
-				volume.castShadow = true;
+					mat.map = texture;
+					mat.needsUpdate = true;
+
+				} );
+
+				
+                                let volume = new Physijs.SoftMesh( bufferGeom, mat, mass, pressure );	
+                                console.log(volume.physicsBody);
+                            
+                                volume.castShadow = true;
 				volume.receiveShadow = true;
 				volume.frustumCulled = false;
 				scene.add( volume );
 
-				textureLoader.load( "textures/colors.png", function ( texture ) {
-
-					volume.material.map = texture;
-					volume.material.needsUpdate = true;
-
-				} );
+				let _physijs = volume.physicsBody._physijs;
 
 				// Volume physic object
 
 				var volumeSoftBody = softBodyHelpers.CreateFromTriMesh(
 					physicsWorld.getWorldInfo(),
-					bufferGeom.ammoVertices,
-					bufferGeom.ammoIndices,
-					bufferGeom.ammoIndices.length / 3,
+					_physijs.ammoVertices,
+					_physijs.ammoIndices,
+					_physijs.ammoIndices.length / 3,
 					true );
 
 				var sbConfig = volumeSoftBody.get_m_cfg();
@@ -274,7 +227,8 @@ import BufferGeometryUtils from "../../src/utils/BufferGeometryUtils.js";
 
 				volumeSoftBody.setTotalMass( mass, false );
 				Ammo.castObject( volumeSoftBody, Ammo.btCollisionObject ).getCollisionShape().setMargin( margin );
-				physicsWorld.addSoftBody( volumeSoftBody, 1, - 1 );
+				
+                                physicsWorld.addSoftBody( volumeSoftBody, 1, - 1 );
 				volume.userData.physicsBody = volumeSoftBody;
 				// Disable deactivation
 				volumeSoftBody.setActivationState( 4 );
@@ -283,13 +237,14 @@ import BufferGeometryUtils from "../../src/utils/BufferGeometryUtils.js";
 
 			}
 
-			function createParalellepiped( sx, sy, sz, mass, pos, quat, material ) {
+			function createParalellepiped( threeObject, pos, quat ) {
 
-				var threeObject = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
-				var shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
+				console.log(threeObject);
+                                let _physijs = threeObject.physicsBody._physijs;
+                            var shape = new Ammo.btBoxShape( new Ammo.btVector3( _physijs.width * 0.5, _physijs.height * 0.5, _physijs.depth * 0.5 ) );
 				shape.setMargin( margin );
 
-				createRigidBody( threeObject, shape, mass, pos, quat );
+				createRigidBody( threeObject, shape, _physijs.mass, pos, quat );
 
 				return threeObject;
 
@@ -410,57 +365,94 @@ import BufferGeometryUtils from "../../src/utils/BufferGeometryUtils.js";
 				renderer.render( scene, camera );
 
 			}
+                        
+                        function updateSoftBody( report ){
+                            
+                            let length = report[1];
+                            let offset = 2;
+                            
+                            for ( var i = 0, il = length; i < il; i ++ ) {
+                                
+                                var volume = softBodies[ i ];
+                                var geometry = volume.geometry;
+                                var volumePositions = geometry.attributes.position.array;
+				var volumeNormals = geometry.attributes.normal.array;
+                                
+                                let _physijs = volume.physicsBody._physijs;
+                                var association = _physijs.ammoIndexAssociation;
+                                
+                                let numVerts = report[ offset ];
+                                
+                                for ( var j = 0; j < numVerts; j ++ ) {
+                                    var assocVertex = association[ j ];
+
+                                    for ( var k = 0, kl = assocVertex.length; k < kl; k ++ ) {
+
+                                            var indexVertex = assocVertex[ k ];
+                                            volumePositions[ indexVertex ] = report[offset+1];
+                                            volumeNormals[ indexVertex ] = report[offset+4];
+                                            indexVertex ++;
+                                            volumePositions[ indexVertex ] = report[offset+2];
+                                            volumeNormals[ indexVertex ] = report[offset+5];
+                                            indexVertex ++;
+                                            volumePositions[ indexVertex ] = report[offset+3];
+                                            volumeNormals[ indexVertex ] = report[offset+6];
+
+                                    }
+                                    offset += 6;
+                                }
+                                offset += 1;
+                                
+                                geometry.attributes.position.needsUpdate = true;
+				geometry.attributes.normal.needsUpdate = true;
+                            }
+                        } 
 
 			function updatePhysics( deltaTime ) {
 
 				// Step world
 				physicsWorld.stepSimulation( deltaTime, 10 );
+                                
+                                let length = softBodies.length;
+                                report = [];
+                                report[0] = 4;
+                                report[1] = length;
+                                let offset = 2;
+                                let volume, _physijs, softBody;
+                                
 
 				// Update soft volumes
-				for ( var i = 0, il = softBodies.length; i < il; i ++ ) {
+				for ( let i = 0, il = length; i < il; i ++ ) {
 
-					var volume = softBodies[ i ];
-					var geometry = volume.geometry;
-					var softBody = volume.userData.physicsBody;
-					var volumePositions = geometry.attributes.position.array;
-					var volumeNormals = geometry.attributes.normal.array;
-					var association = geometry.ammoIndexAssociation;
-					var numVerts = association.length;
-					var nodes = softBody.get_m_nodes();
-					for ( var j = 0; j < numVerts; j ++ ) {
+                                    volume = softBodies[ i ];
+                                    _physijs = volume.physicsBody._physijs;
 
-						var node = nodes.at( j );
-						var nodePos = node.get_m_x();
-						var x = nodePos.x();
-						var y = nodePos.y();
-						var z = nodePos.z();
-						var nodeNormal = node.get_m_n();
-						var nx = nodeNormal.x();
-						var ny = nodeNormal.y();
-						var nz = nodeNormal.z();
+                                    softBody = volume.userData.physicsBody;
 
-						var assocVertex = association[ j ];
+                                    var association = _physijs.ammoIndexAssociation;
+                                    var numVerts = association.length;
+                                    var nodes = softBody.get_m_nodes();
+					
+                                    report[ offset ] = numVerts;
+                                    for ( var j = 0; j < numVerts; j ++ ) {
 
-						for ( var k = 0, kl = assocVertex.length; k < kl; k ++ ) {
+                                            var node = nodes.at( j );
 
-							var indexVertex = assocVertex[ k ];
-							volumePositions[ indexVertex ] = x;
-							volumeNormals[ indexVertex ] = nx;
-							indexVertex ++;
-							volumePositions[ indexVertex ] = y;
-							volumeNormals[ indexVertex ] = ny;
-							indexVertex ++;
-							volumePositions[ indexVertex ] = z;
-							volumeNormals[ indexVertex ] = nz;
+                                            var nodePos = node.get_m_x();			
+                                            report[offset+1] = nodePos.x();
+                                            report[offset+2] = nodePos.y();
+                                            report[offset+3] = nodePos.z();
 
-						}
+                                            var nodeNormal = node.get_m_n();
+                                            report[offset+4] = nodeNormal.x();
+                                            report[offset+5] = nodeNormal.y();
+                                            report[offset+6] = nodeNormal.z();
 
-					}
-
-					geometry.attributes.position.needsUpdate = true;
-					geometry.attributes.normal.needsUpdate = true;
-
+                                            offset += 6;
+                                    }
+                                    offset += 1;					
 				}
+                                updateSoftBody( report );
 
 				// Update rigid bodies
 				for ( var i = 0, il = rigidBodies.length; i < il; i ++ ) {

@@ -125,12 +125,12 @@
     };
     
     public_functions.removeObject = function( details ) {
-        if ( description.type === "soft" ){ 
+        if ( details.type === "soft" ){ 
             removeSoftShape( details );
         } else {
                 world.removeRigidBody( _objects[details.id] );
-                Ammo.destroy(_objects[details.id]);
-                Ammo.destroy(_motion_states[details.id]);
+                Ammo.destroy( _objects[details.id] );
+                Ammo.destroy( _motion_states[details.id] );
             if (_compound_shapes[details.id]) Ammo.destroy(_compound_shapes[details.id]);
                 if (_noncached_shapes[details.id]) Ammo.destroy(_noncached_shapes[details.id]);
                 var ptr = _objects[details.id].a != undefined ? _objects[details.id].a : _objects[details.id].ptr;
