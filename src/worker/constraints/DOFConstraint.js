@@ -21,8 +21,21 @@
         Ammo = self.Ammo;
         _vec3_1 = self._vec3_1 || new Ammo.btVector3(0,0,0);
         _vec3_2 = self._vec3_2 || new Ammo.btVector3(0,0,0);
+        
+        //polyfill
+        if ( !Ammo.btGeneric6DofConstraint.prototype.getRigidBodyA ) {
+            Ammo.btGeneric6DofConstraint.prototype.getRigidBodyA = function(){
+                return _objects[ this._rigidBodyA ];
+            };
+        }
+        if ( !Ammo.btGeneric6DofConstraint.prototype.getRigidBodyB ) {
+            Ammo.btGeneric6DofConstraint.prototype.getRigidBodyB = function(){
+                return _objects[ this._rigidBodyB ];
+            };
+        }
+         console.log("***", Ammo.btGeneric6DofConstraint.prototype);
     });
-    
+   
     
     self.knownConstraints.dof = function( details ){
         
@@ -58,8 +71,12 @@
                     _objects[ details.objecta ],
                     _objects[ details.objectb ],
                     transforma,
-                    transformb
+                    transformb,
+                    null
             );
+  
+            constraint._rigidBodyA = details.objecta;
+            constraint._rigidBodyB = details.objectb;
 
             Ammo.destroy( transformb );
             
@@ -68,6 +85,7 @@
                     _objects[ details.objecta ],
                     transforma
             );
+            constraint._rigidBodyA = details.objecta;
         }
         Ammo.destroy( transforma );
 

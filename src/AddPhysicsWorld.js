@@ -7,6 +7,7 @@
 
 import * as THREE from './three.module.js';
 import { Vehicle } from './PhysicsVehicle.js';
+import AddPhysics from './AddPhysicsGlobals.js';
 
 // constants
 const MESSAGE_TYPES = {
@@ -16,52 +17,57 @@ const MESSAGE_TYPES = {
         CONSTRAINTREPORT: 3,
         SOFTBODYREPORT :4
 };
+
 const  REPORT_ITEMSIZE = 14,
     COLLISIONREPORT_ITEMSIZE = 5,
-    VEHICLEREPORT_ITEMSIZE = 9,
     CONSTRAINTREPORT_ITEMSIZE = 6;
     
-    let  _is_simulating = false,
-        _temp1, _temp2,
+    AddPhysics.status._is_simulating = false;
+    let    _temp1, _temp2,
         _temp_vector3_1 = new THREE.Vector3(),
         _temp_vector3_2 = new THREE.Vector3(),
         _temp_matrix4_1 = new THREE.Matrix4(),
         _quaternion_1 = new THREE.Quaternion();
 
-let SUPPORT_TRANSFERABLE;
 
-const addObjectChildren = function( parent, object ) {
+const addObjectChildren = function( parent, object ) 
+{
+    let child;
+    for ( let i = 0; i < object.children.length; i++ ) 
+    {
+        child = object.children[i];
+        
+        if ( child._physijs ) {
+            
+            child.updateMatrix();
+            child.updateMatrixWorld();
 
-    for ( let i = 0; i < object.children.length; i++ ) {
-            if ( object.children[i]._physijs ) {
-                    object.children[i].updateMatrix();
-                    object.children[i].updateMatrixWorld();
+            _temp_vector3_1.setFromMatrixPosition( child.matrixWorld );
+            _quaternion_1.setFromRotationMatrix( child.matrixWorld );
 
-                    _temp_vector3_1.setFromMatrixPosition( object.children[i].matrixWorld );
-                    _quaternion_1.setFromRotationMatrix( object.children[i].matrixWorld );
+            child._physijs.position_offset = {
+                    x: _temp_vector3_1.x,
+                    y: _temp_vector3_1.y,
+                    z: _temp_vector3_1.z
+            };
 
-                    object.children[i]._physijs.position_offset = {
-                            x: _temp_vector3_1.x,
-                            y: _temp_vector3_1.y,
-                            z: _temp_vector3_1.z
-                    };
+            child._physijs.rotation = {
+                    x: _quaternion_1.x,
+                    y: _quaternion_1.y,
+                    z: _quaternion_1.z,
+                    w: _quaternion_1.w
+            };
 
-                    object.children[i]._physijs.rotation = {
-                            x: _quaternion_1.x,
-                            y: _quaternion_1.y,
-                            z: _quaternion_1.z,
-                            w: _quaternion_1.w
-                    };
+            parent._physijs.children.push( child._physijs );
+        }
 
-                    parent._physijs.children.push( object.children[i]._physijs );
-            }
-
-            addObjectChildren( parent, object.children[i] );
+        addObjectChildren( parent, child );
     }
 };
 
 const PhysicsWorld = function( scene, params ){
-    var self = this;
+    
+    let self = this;
     
     scene.addEventListener("physicsBodyAdded", function( event ){
         self.onAdd( event.object );
@@ -71,15 +77,16 @@ const PhysicsWorld = function( scene, params ){
         self.onRemove( event.object );
     });
     
-    this._worker = new Worker( Scene.scripts.worker || 'physijs_worker.js' );
+    this._worker = new Worker( PhysicsWorld.scripts.worker || 'physijs_worker.js' );
     this._worker.transferableMessage = this._worker.webkitPostMessage || this._worker.postMessage;
     this._materials_ref_counts = {};
     this._objects = {};
     this._vehicles = {};
     this._constraints = {};
-    var ab = new ArrayBuffer( 1 );
-        this._worker.transferableMessage( ab, [ab] );
-        SUPPORT_TRANSFERABLE = ( ab.byteLength === 0 );
+    
+    let ab = new ArrayBuffer( 1 );
+    this._worker.transferableMessage( ab, [ab] );
+    AddPhysics.SUPPORT_TRANSFERABLE = ( ab.byteLength === 0 );
 
         this._worker.onmessage = function ( event ) {
                 let _temp;
@@ -94,7 +101,7 @@ const PhysicsWorld = function( scene, params ){
                         // transferable object
                         switch ( data[0] ) {
                                 case MESSAGE_TYPES.WORLDREPORT:
-                                        self._updateScene( data );
+                                        AddPhysics.updateFunctions._updateScene.call( self, data );
                                         break;
 
                                 case MESSAGE_TYPES.COLLISIONREPORT:
@@ -102,7 +109,7 @@ const PhysicsWorld = function( scene, params ){
                                         break;
 
                                 case MESSAGE_TYPES.VEHICLEREPORT:
-                                        self._updateVehicles( data );
+                                        AddPhysics.updateFunctions._updateVehicles.call( self, data );
                                         break;
 
                                 case MESSAGE_TYPES.CONSTRAINTREPORT:
@@ -142,7 +149,7 @@ const PhysicsWorld = function( scene, params ){
 
                                 switch ( data[0] ) {
                                         case MESSAGE_TYPES.WORLDREPORT:
-                                                self._updateScene( data );
+                                                AddPhysics.updateFunctions._updateScene.call( self, data );
                                                 break;
 
                                         case MESSAGE_TYPES.COLLISIONREPORT:
@@ -150,7 +157,7 @@ const PhysicsWorld = function( scene, params ){
                                                 break;
 
                                         case MESSAGE_TYPES.VEHICLEREPORT:
-                                                self._updateVehicles( data );
+                                                AddPhysics.updateFunctions._updateVehicles.call( self, data );
                                                 break;
 
                                         case MESSAGE_TYPES.CONSTRAINTREPORT:
@@ -158,7 +165,7 @@ const PhysicsWorld = function( scene, params ){
                                                 break;
                                                 
                                         case MESSAGE_TYPES.SOFTBODYREPORT:
-                                                self._updateSoftBodies( data );
+                                                AddPhysics.updateFunctions._updateSoftBodies.call( self, data );
                                                 break;
                                 }
 
@@ -169,7 +176,7 @@ const PhysicsWorld = function( scene, params ){
 
 
         params = params || {};
-        params.ammo = Scene.scripts.ammo || 'ammo.js';
+        params.ammo = PhysicsWorld.scripts.ammo || 'ammo.js';
         params.fixedTimeStep = params.fixedTimeStep || 1 / 60;
         params.rateLimit = params.rateLimit || true;
         this.execute( 'init', params );
@@ -193,18 +200,18 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
             this._objects[_physijs.id] = object;
 
             if ( object.children.length ) {
-                    _physijs.children = [];
-                    addObjectChildren( object, object );
+                _physijs.children = [];
+                addObjectChildren( object, object );
             }
 
             if ( object.material._physijs ) {
-                    if ( !this._materials_ref_counts.hasOwnProperty( object.material._physijs.id ) ) {
-                            this.execute( 'registerMaterial', object.material._physijs );
-                            _physijs.materialId = object.material._physijs.id;
-                            this._materials_ref_counts[object.material._physijs.id] = 1;
-                    } else {
-                            this._materials_ref_counts[object.material._physijs.id]++;
-                    }
+                if ( !this._materials_ref_counts.hasOwnProperty( object.material._physijs.id ) ) {
+                        this.execute( 'registerMaterial', object.material._physijs );
+                        _physijs.materialId = object.material._physijs.id;
+                        this._materials_ref_counts[object.material._physijs.id] = 1;
+                } else {
+                        this._materials_ref_counts[object.material._physijs.id]++;
+                }
             }
 
             // Object starting position + rotation
@@ -228,7 +235,7 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
         } 
     },
     
-    onRemove : function( object ) {
+    onRemove : function( object ) { 
         
         let _physijs = object.physicsBody._physijs;
        
@@ -261,11 +268,11 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
     simulate : function( timeStep, maxSubSteps ) {
 	let object, _physijs, update;
         
-        if ( _is_simulating ) {
+        if ( AddPhysics.status._is_simulating ) {
             return false;
         }
         
-        _is_simulating = true;
+        AddPhysics.status._is_simulating = true;
 
 	let object_id;	
         for ( object_id in this._objects ) {
@@ -296,142 +303,8 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
 
         return true;
     },
-    
-    _updateScene : function( data ) {
-		var num_objects = data[1],
-			object, _physijs,
-			i, offset;
-
-		for ( i = 0; i < num_objects; i++ ) {
-			offset = 2 + i * REPORT_ITEMSIZE;
-			object = this._objects[ data[ offset ] ];
-
-			if ( object === undefined ) {
-				continue;
-			}
-                        
-                        _physijs = object.physicsBody._physijs;
-
-			if ( object.physicsBody.__dirtyPosition === false ) {
-				object.position.set(
-					data[ offset + 1 ],
-					data[ offset + 2 ],
-					data[ offset + 3 ]
-				);
-			}
-
-			if ( object.physicsBody.__dirtyRotation === false ) {
-				object.quaternion.set(
-					data[ offset + 4 ],
-					data[ offset + 5 ],
-					data[ offset + 6 ],
-					data[ offset + 7 ]
-				);
-			}
-
-			_physijs.linearVelocity.set(
-				data[ offset + 8 ],
-				data[ offset + 9 ],
-				data[ offset + 10 ]
-			);
-
-			_physijs.angularVelocity.set(
-				data[ offset + 11 ],
-				data[ offset + 12 ],
-				data[ offset + 13 ]
-			);
-
-		}
-
-		if ( SUPPORT_TRANSFERABLE ) {
-			// Give the typed array back to the worker
-			this._worker.transferableMessage( data.buffer, [data.buffer] );
-		}
-
-		_is_simulating = false;
-		this.dispatchEvent( {type : 'update'} );
-	},
         
-        _updateSoftBodies : function( data ){
-            
-            const length = data[1];
-            
-            let object;
-            let numVerts;
-            
-            let offset =2;
-            
-            for ( var i = 0, il = length; i < il; i ++ ) {
-                
-                object = this._objects[ data[offset] ];
-                offset += 1;
-                
-                
-                let volumePositions = object.geometry.attributes.position.array;
-                let volumeNormals = object.geometry.attributes.normal.array;
-                let association = object._physijs.ammoIndexAssociation;
-                
-                numVerts = data[offset];
-
-                for ( let j = 0; j < numVerts; j ++ ) {
-                    let assocVertex = association[ j ];
-
-                    for ( let k = 0, kl = assocVertex.length; k < kl; k ++ ) {
-
-                            var indexVertex = assocVertex[ k ];
-                            volumePositions[ indexVertex ] = data[offset+1];
-                            volumeNormals[ indexVertex ] = data[offset+4];
-                            indexVertex ++;
-                            volumePositions[ indexVertex ] = data[offset+2];
-                            volumeNormals[ indexVertex ] = data[offset+5];
-                            indexVertex ++;
-                            volumePositions[ indexVertex ] = data[offset+3];
-                            volumeNormals[ indexVertex ] = data[offset+6];
-
-                    }
-                    offset += 6;
-                }
-                offset += 1;
-
-                object.geometry.attributes.position.needsUpdate = true;
-                object.geometry.attributes.normal.needsUpdate = true;
-            }
-            
-        },
         
-        _updateVehicles : function( data ) {
-		var vehicle, wheel,
-			i, offset;
-
-		for ( i = 0; i < ( data.length - 1 ) / VEHICLEREPORT_ITEMSIZE; i++ ) {
-			offset = 1 + i * VEHICLEREPORT_ITEMSIZE;
-			vehicle = this._vehicles[ data[ offset ] ];
-
-			if ( vehicle === undefined ) {
-				continue;
-			}
-
-			wheel = vehicle.wheels[ data[ offset + 1 ] ];
-
-			wheel.position.set(
-				data[ offset + 2 ],
-				data[ offset + 3 ],
-				data[ offset + 4 ]
-			);
-
-			wheel.quaternion.set(
-				data[ offset + 5 ],
-				data[ offset + 6 ],
-				data[ offset + 7 ],
-				data[ offset + 8 ]
-			);
-		}
-
-		if ( SUPPORT_TRANSFERABLE ) {
-			// Give the typed array back to the worker
-			this._worker.transferableMessage( data.buffer, [data.buffer] );
-		}
-	},
         _updateConstraints : function( data ) {
 		var constraint, object,
 			i, offset;
@@ -457,7 +330,7 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
 			constraint.appliedImpulse = data[ offset + 5 ] ;
 		}
 
-		if ( SUPPORT_TRANSFERABLE ) {
+		if ( AddPhysics.SUPPORT_TRANSFERABLE ) {
 			// Give the typed array back to the worker
 			this._worker.transferableMessage( data.buffer, [data.buffer] );
 		}
@@ -540,7 +413,7 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
 								);
 							}
 
-							object.dispatchEvent( {type:'collision'}, object2, _temp1, _temp2, _temp_vector3_1 );
+							object.dispatchEvent( {type:'collision', detail:[ object2, _temp1, _temp2, _temp_vector3_1]} );
 						}
 					}
 				}
@@ -556,7 +429,7 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
 
 		this.collisions = collisions;
 
-		if ( SUPPORT_TRANSFERABLE ) {
+		if ( AddPhysics.SUPPORT_TRANSFERABLE ) {
 			// Give the typed array back to the worker
 			this._worker.transferableMessage( data.buffer, [data.buffer] );
 		}
@@ -564,131 +437,45 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
         addConstraint : function ( constraint, show_marker ) {
 		this._constraints[ constraint.id ] = constraint;
 		this.execute( 'addConstraint', constraint.getDefinition() );
+                
 
-		if ( show_marker ) {
-			var marker;
-
-			switch ( constraint.type ) {
-				case 'point':
-					marker = new THREE.Mesh(
-						new THREE.SphereGeometry( 1.5 ),
-						new THREE.MeshNormalMaterial
-					);
-					marker.position.copy( constraint.positiona );
-					this._objects[ constraint.objecta ].add( marker );
-					break;
-
-				case 'hinge':
-					marker = new THREE.Mesh(
-						new THREE.SphereGeometry( 1.5 ),
-						new THREE.MeshNormalMaterial
-					);
-					marker.position.copy( constraint.positiona );
-					this._objects[ constraint.objecta ].add( marker );
-					break;
-
-				case 'slider':
-					marker = new THREE.Mesh(
-						new THREE.BoxGeometry( 10, 1, 1 ),
-						new THREE.MeshNormalMaterial
-					);
-					marker.position.copy( constraint.positiona );
-					// This rotation isn't right if all three axis are non-0 values
-					// TODO: change marker's rotation order to ZYX
-					marker.rotation.set(
-						constraint.axis.y, // yes, y and
-						constraint.axis.x, // x axis are swapped
-						constraint.axis.z
-					);
-					this._objects[ constraint.objecta ].add( marker );
-					break;
-
-				case 'conetwist':
-					marker = new THREE.Mesh(
-						new THREE.SphereGeometry( 1.5 ),
-						new THREE.MeshNormalMaterial
-					);
-					marker.position.copy( constraint.positiona );
-					this._objects[ constraint.objecta ].add( marker );
-					break;
-
-				case 'dof':
-					marker = new THREE.Mesh(
-						new THREE.SphereGeometry( 1.5 ),
-						new THREE.MeshNormalMaterial
-					);
-					marker.position.copy( constraint.positiona );
-					this._objects[ constraint.objecta ].add( marker );
-					break;
-			}
+		if ( show_marker && typeof AddPhysics.addFunctions.constraint[constraint.type] === "function") {
+                    
+                    AddPhysics.addFunctions.constraint[constraint.type]( constraint );			
 		}
 
 		return constraint;
 	}
 });
+
 PhysicsWorld.addPhysics = function( scene, params ){
     scene.physicsWorld = new PhysicsWorld( scene, params );
     return scene.physicsWorld;
 };
 
-	PhysicsWorld.prototype.removeConstraint = function( constraint ) {
-		if ( this._constraints[constraint.id ] !== undefined ) {
-			this.execute( 'removeConstraint', { id: constraint.id } );
-			delete this._constraints[ constraint.id ];
-		}
-	};
-
-	PhysicsWorld.prototype.execute = function( cmd, params ) {
-		this._worker.postMessage({ cmd: cmd, params: params });
-	};
-        
-
-	PhysicsWorld.prototype.setFixedTimeStep = function( fixedTimeStep ) {
-		if ( fixedTimeStep ) {
-			this.execute( 'setFixedTimeStep', fixedTimeStep );
-		}
-	};
-
-	PhysicsWorld.prototype.setGravity = function( gravity ) {
-		if ( gravity ) {
-			this.execute( 'setGravity', gravity );
-		}
-	};
-        
-        let Scene = function( params ) {
-
-    THREE.Scene.call( this );
-    PhysicsWorld.call( this, this, params );
-    this.physicsWorld = this;
-	
+PhysicsWorld.prototype.removeConstraint = function( constraint ) {
+        if ( this._constraints[constraint.id ] !== undefined ) {
+                this.execute( 'removeConstraint', { id: constraint.id } );
+                delete this._constraints[ constraint.id ];
+        }
 };
 
-Scene.prototype = Object.assign( Object.create( THREE.Scene.prototype ), PhysicsWorld.prototype, {
-    constructor : Scene,
-    
-    add : function( object ){
+PhysicsWorld.prototype.execute = function( cmd, params ) {
+        this._worker.postMessage({ cmd: cmd, params: params });
+};
 
-       if ( object instanceof Vehicle ) { 
-           THREE.Scene.prototype.add.call( this, object.mesh );
-           object.world = this;
-           this._vehicles[ object._physijs.id ] = object;
-           this.execute( 'addVehicle', object._physijs );
 
-       } else {
-           THREE.Scene.prototype.add.call( this, object );
-       }
-    },
-    
-    remove : function( object ) {
-        this.onRemove( object );
-    }
-});
+PhysicsWorld.prototype.setFixedTimeStep = function( fixedTimeStep ) {
+        if ( fixedTimeStep ) {
+                this.execute( 'setFixedTimeStep', fixedTimeStep );
+        }
+};
 
-Scene.scripts = {
-    ammo : 'ammo.js',
-    worker : 'physijs_worker.js'
+PhysicsWorld.prototype.setGravity = function( gravity ) {
+        if ( gravity ) {
+                this.execute( 'setGravity', gravity );
+        }
 };
         
-export default Scene;
-export { Scene, PhysicsWorld }
 
+export default PhysicsWorld;

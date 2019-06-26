@@ -49197,6 +49197,34 @@ let convertWorldPositionToObject = function( position, object ) {
  * and open the template in the editor.
  */
 
+
+let AddPhysics = {
+    updateFunctions : {  
+    },
+    addFunctions : {
+        constraint:{}
+    },
+    SUPPORT_TRANSFERABLE : false,
+    status : {
+        _is_simulating : false
+    }
+};
+
+/* 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+AddPhysics.addFunctions.constraint.dof = function( constraint ){
+    let marker = new Mesh(
+            new SphereGeometry( 1.5 ),
+            new MeshNormalMaterial
+    );
+    marker.position.copy( constraint.positiona );
+    this._objects[ constraint.objecta ].add( marker );
+};
+
 let DOFConstraint = function( objecta, objectb, position ) {
         if ( position === undefined ) {
                 position = objectb;
@@ -49257,6 +49285,16 @@ DOFConstraint.prototype.disableAngularMotor = function( which ) {
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+AddPhysics.addFunctions.constraint.point = function( constraint ){
+    let marker = new Mesh(
+            new SphereGeometry( 1.5 ),
+            new MeshNormalMaterial
+    );
+    marker.position.copy( constraint.positiona );
+    this._objects[ constraint.objecta ].add( marker );
+};
+
+
 let PointConstraint = function( objecta, objectb, position ) {
         if ( position === undefined ) {
                 position = objectb;
@@ -49291,6 +49329,22 @@ PointConstraint.prototype.getDefinition = function() {
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+AddPhysics.addFunctions.constraint.slider = function( constraint ){
+    let marker = new Mesh(
+            new BoxGeometry( 10, 1, 1 ),
+            new MeshNormalMaterial
+    );
+    marker.position.copy( constraint.positiona );
+    // This rotation isn't right if all three axis are non-0 values
+    // TODO: change marker's rotation order to ZYX
+    marker.rotation.set(
+            constraint.axis.y, // yes, y and
+            constraint.axis.x, // x axis are swapped
+            constraint.axis.z
+    );
+    this._objects[ constraint.objecta ].add( marker );
+};
+
 let SliderConstraint = function( objecta, objectb, position, axis ) {
         if ( axis === undefined ) {
                 axis = position;
@@ -49354,6 +49408,15 @@ SliderConstraint.prototype.disableAngularMotor = function() {
  * and open the template in the editor.
  */
 
+AddPhysics.addFunctions.constraint.hinge = function( constraint ){
+    let marker = new Mesh(
+            new SphereGeometry( 1.5 ),
+            new MeshNormalMaterial
+    );
+    marker.position.copy( constraint.positiona );
+    this._objects[ constraint.objecta ].add( marker );
+};
+
 let HingeConstraint = function( objecta, objectb, position, axis ) {
         if ( axis === undefined ) {
                 axis = position;
@@ -49376,15 +49439,15 @@ let HingeConstraint = function( objecta, objectb, position, axis ) {
         }
 };
 HingeConstraint.prototype.getDefinition = function() {
-        return {
-                type: this.type,
-                id: this.id,
-                objecta: this.objecta,
-                objectb: this.objectb,
-                positiona: this.positiona,
-                positionb: this.positionb,
-                axis: this.axis
-        };
+    return {
+            type: this.type,
+            id: this.id,
+            objecta: this.objecta,
+            objectb: this.objectb,
+            positiona: this.positiona,
+            positionb: this.positionb,
+            axis: this.axis
+    };
 };
 
 /*
@@ -49410,6 +49473,16 @@ HingeConstraint.prototype.disableMotor = function( velocity, acceleration ) {
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
+AddPhysics.addFunctions.constraint.conetwist = function( constraint ){
+    let marker = new Mesh(
+            new SphereGeometry( 1.5 ),
+            new MeshNormalMaterial
+    );
+    marker.position.copy( constraint.positiona );
+    this._objects[ constraint.objecta ].add( marker );
+};
+
 
 let ConeTwistConstraint = function( objecta, objectb, position ) {
         if ( position === undefined ) {
@@ -49467,6 +49540,8 @@ ConeTwistConstraint.prototype.disableMotor = function() {
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
+const VEHICLEREPORT_ITEMSIZE = 9;
 
 // Physijs.Vehicle
 let Vehicle = function( mesh, tuning ) {
@@ -49544,6 +49619,39 @@ let VehicleTuning = function( suspension_stiffness, suspension_compression, susp
         this.max_suspension_force = max_suspension_force !== undefined ? max_suspension_force : 6000;
 };
 
+AddPhysics.updateFunctions._updateVehicles = function( data ) {
+        let vehicle, wheel, offset;
+
+        for ( let i = 0; i < ( data.length - 1 ) / VEHICLEREPORT_ITEMSIZE; i++ ) {
+                offset = 1 + i * VEHICLEREPORT_ITEMSIZE;
+                vehicle = this._vehicles[ data[ offset ] ];
+
+                if ( vehicle === undefined ) {
+                    continue;
+                }
+
+                wheel = vehicle.wheels[ data[ offset + 1 ] ];
+
+                wheel.position.set(
+                    data[ offset + 2 ],
+                    data[ offset + 3 ],
+                    data[ offset + 4 ]
+                );
+
+                wheel.quaternion.set(
+                    data[ offset + 5 ],
+                    data[ offset + 6 ],
+                    data[ offset + 7 ],
+                    data[ offset + 8 ]
+                );
+        }
+
+        if ( AddPhysics.SUPPORT_TRANSFERABLE ) {
+                // Give the typed array back to the worker
+                this._worker.transferableMessage( data.buffer, [data.buffer] );
+        }
+};
+
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -49559,52 +49667,51 @@ const MESSAGE_TYPES = {
         CONSTRAINTREPORT: 3,
         SOFTBODYREPORT :4
 };
-const REPORT_ITEMSIZE = 14;
+
 const COLLISIONREPORT_ITEMSIZE = 5;
-const VEHICLEREPORT_ITEMSIZE = 9;
 const CONSTRAINTREPORT_ITEMSIZE = 6;
     
-    let _is_simulating = false;
+    AddPhysics.status._is_simulating = false;
     let _temp1;
     let _temp2;
     let _temp_vector3_1$1 = new Vector3();
     let _temp_matrix4_1$1 = new Matrix4();
     let _quaternion_1 = new Quaternion();
 
-let SUPPORT_TRANSFERABLE;
 
 const addObjectChildren = function( parent, object ) {
 
     for ( let i = 0; i < object.children.length; i++ ) {
-            if ( object.children[i]._physijs ) {
-                    object.children[i].updateMatrix();
-                    object.children[i].updateMatrixWorld();
+        if ( object.children[i]._physijs ) {
+                object.children[i].updateMatrix();
+                object.children[i].updateMatrixWorld();
 
-                    _temp_vector3_1$1.setFromMatrixPosition( object.children[i].matrixWorld );
-                    _quaternion_1.setFromRotationMatrix( object.children[i].matrixWorld );
+                _temp_vector3_1$1.setFromMatrixPosition( object.children[i].matrixWorld );
+                _quaternion_1.setFromRotationMatrix( object.children[i].matrixWorld );
 
-                    object.children[i]._physijs.position_offset = {
-                            x: _temp_vector3_1$1.x,
-                            y: _temp_vector3_1$1.y,
-                            z: _temp_vector3_1$1.z
-                    };
+                object.children[i]._physijs.position_offset = {
+                        x: _temp_vector3_1$1.x,
+                        y: _temp_vector3_1$1.y,
+                        z: _temp_vector3_1$1.z
+                };
 
-                    object.children[i]._physijs.rotation = {
-                            x: _quaternion_1.x,
-                            y: _quaternion_1.y,
-                            z: _quaternion_1.z,
-                            w: _quaternion_1.w
-                    };
+                object.children[i]._physijs.rotation = {
+                        x: _quaternion_1.x,
+                        y: _quaternion_1.y,
+                        z: _quaternion_1.z,
+                        w: _quaternion_1.w
+                };
 
-                    parent._physijs.children.push( object.children[i]._physijs );
-            }
+                parent._physijs.children.push( object.children[i]._physijs );
+        }
 
-            addObjectChildren( parent, object.children[i] );
+        addObjectChildren( parent, object.children[i] );
     }
 };
 
 const PhysicsWorld = function( scene, params ){
-    var self = this;
+    
+    let self = this;
     
     scene.addEventListener("physicsBodyAdded", function( event ){
         self.onAdd( event.object );
@@ -49614,15 +49721,16 @@ const PhysicsWorld = function( scene, params ){
         self.onRemove( event.object );
     });
     
-    this._worker = new Worker( Scene$1.scripts.worker || 'physijs_worker.js' );
+    this._worker = new Worker( PhysicsWorld.scripts.worker || 'physijs_worker.js' );
     this._worker.transferableMessage = this._worker.webkitPostMessage || this._worker.postMessage;
     this._materials_ref_counts = {};
     this._objects = {};
     this._vehicles = {};
     this._constraints = {};
-    var ab = new ArrayBuffer( 1 );
-        this._worker.transferableMessage( ab, [ab] );
-        SUPPORT_TRANSFERABLE = ( ab.byteLength === 0 );
+    
+    let ab = new ArrayBuffer( 1 );
+    this._worker.transferableMessage( ab, [ab] );
+    AddPhysics.SUPPORT_TRANSFERABLE = ( ab.byteLength === 0 );
 
         this._worker.onmessage = function ( event ) {
                 let _temp;
@@ -49637,7 +49745,7 @@ const PhysicsWorld = function( scene, params ){
                         // transferable object
                         switch ( data[0] ) {
                                 case MESSAGE_TYPES.WORLDREPORT:
-                                        self._updateScene( data );
+                                        AddPhysics.updateFunctions._updateScene.call( self, data );
                                         break;
 
                                 case MESSAGE_TYPES.COLLISIONREPORT:
@@ -49645,7 +49753,7 @@ const PhysicsWorld = function( scene, params ){
                                         break;
 
                                 case MESSAGE_TYPES.VEHICLEREPORT:
-                                        self._updateVehicles( data );
+                                        AddPhysics.updateFunctions._updateVehicles.call( self, data );
                                         break;
 
                                 case MESSAGE_TYPES.CONSTRAINTREPORT:
@@ -49685,7 +49793,7 @@ const PhysicsWorld = function( scene, params ){
 
                                 switch ( data[0] ) {
                                         case MESSAGE_TYPES.WORLDREPORT:
-                                                self._updateScene( data );
+                                                AddPhysics.updateFunctions._updateScene.call( self, data );
                                                 break;
 
                                         case MESSAGE_TYPES.COLLISIONREPORT:
@@ -49693,7 +49801,7 @@ const PhysicsWorld = function( scene, params ){
                                                 break;
 
                                         case MESSAGE_TYPES.VEHICLEREPORT:
-                                                self._updateVehicles( data );
+                                                AddPhysics.updateFunctions._updateVehicles.call( self, data );
                                                 break;
 
                                         case MESSAGE_TYPES.CONSTRAINTREPORT:
@@ -49701,7 +49809,7 @@ const PhysicsWorld = function( scene, params ){
                                                 break;
                                                 
                                         case MESSAGE_TYPES.SOFTBODYREPORT:
-                                                self._updateSoftBodies( data );
+                                                AddPhysics.updateFunctions._updateSoftBodies.call( self, data );
                                                 break;
                                 }
 
@@ -49712,7 +49820,7 @@ const PhysicsWorld = function( scene, params ){
 
 
         params = params || {};
-        params.ammo = Scene$1.scripts.ammo || 'ammo.js';
+        params.ammo = PhysicsWorld.scripts.ammo || 'ammo.js';
         params.fixedTimeStep = params.fixedTimeStep || 1 / 60;
         params.rateLimit = params.rateLimit || true;
         this.execute( 'init', params );
@@ -49736,18 +49844,18 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , EventDispatcher
             this._objects[_physijs.id] = object;
 
             if ( object.children.length ) {
-                    _physijs.children = [];
-                    addObjectChildren( object, object );
+                _physijs.children = [];
+                addObjectChildren( object, object );
             }
 
             if ( object.material._physijs ) {
-                    if ( !this._materials_ref_counts.hasOwnProperty( object.material._physijs.id ) ) {
-                            this.execute( 'registerMaterial', object.material._physijs );
-                            _physijs.materialId = object.material._physijs.id;
-                            this._materials_ref_counts[object.material._physijs.id] = 1;
-                    } else {
-                            this._materials_ref_counts[object.material._physijs.id]++;
-                    }
+                if ( !this._materials_ref_counts.hasOwnProperty( object.material._physijs.id ) ) {
+                        this.execute( 'registerMaterial', object.material._physijs );
+                        _physijs.materialId = object.material._physijs.id;
+                        this._materials_ref_counts[object.material._physijs.id] = 1;
+                } else {
+                        this._materials_ref_counts[object.material._physijs.id]++;
+                }
             }
 
             // Object starting position + rotation
@@ -49769,7 +49877,7 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , EventDispatcher
         } 
     },
     
-    onRemove : function( object ) {
+    onRemove : function( object ) { 
         
         let _physijs = object.physicsBody._physijs;
        
@@ -49802,11 +49910,11 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , EventDispatcher
     simulate : function( timeStep, maxSubSteps ) {
 	let object, _physijs, update;
         
-        if ( _is_simulating ) {
+        if ( AddPhysics.status._is_simulating ) {
             return false;
         }
         
-        _is_simulating = true;
+        AddPhysics.status._is_simulating = true;
 
 	let object_id;	
         for ( object_id in this._objects ) {
@@ -49837,142 +49945,8 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , EventDispatcher
 
         return true;
     },
-    
-    _updateScene : function( data ) {
-		var num_objects = data[1],
-			object, _physijs,
-			i, offset;
-
-		for ( i = 0; i < num_objects; i++ ) {
-			offset = 2 + i * REPORT_ITEMSIZE;
-			object = this._objects[ data[ offset ] ];
-
-			if ( object === undefined ) {
-				continue;
-			}
-                        
-                        _physijs = object.physicsBody._physijs;
-
-			if ( object.physicsBody.__dirtyPosition === false ) {
-				object.position.set(
-					data[ offset + 1 ],
-					data[ offset + 2 ],
-					data[ offset + 3 ]
-				);
-			}
-
-			if ( object.physicsBody.__dirtyRotation === false ) {
-				object.quaternion.set(
-					data[ offset + 4 ],
-					data[ offset + 5 ],
-					data[ offset + 6 ],
-					data[ offset + 7 ]
-				);
-			}
-
-			_physijs.linearVelocity.set(
-				data[ offset + 8 ],
-				data[ offset + 9 ],
-				data[ offset + 10 ]
-			);
-
-			_physijs.angularVelocity.set(
-				data[ offset + 11 ],
-				data[ offset + 12 ],
-				data[ offset + 13 ]
-			);
-
-		}
-
-		if ( SUPPORT_TRANSFERABLE ) {
-			// Give the typed array back to the worker
-			this._worker.transferableMessage( data.buffer, [data.buffer] );
-		}
-
-		_is_simulating = false;
-		this.dispatchEvent( {type : 'update'} );
-	},
         
-        _updateSoftBodies : function( data ){
-            
-            const length = data[1];
-            
-            let object;
-            let numVerts;
-            
-            let offset =2;
-            
-            for ( var i = 0, il = length; i < il; i ++ ) {
-                
-                object = this._objects[ data[offset] ];
-                offset += 1;
-                
-                
-                let volumePositions = object.geometry.attributes.position.array;
-                let volumeNormals = object.geometry.attributes.normal.array;
-                let association = object._physijs.ammoIndexAssociation;
-                
-                numVerts = data[offset];
-
-                for ( let j = 0; j < numVerts; j ++ ) {
-                    let assocVertex = association[ j ];
-
-                    for ( let k = 0, kl = assocVertex.length; k < kl; k ++ ) {
-
-                            var indexVertex = assocVertex[ k ];
-                            volumePositions[ indexVertex ] = data[offset+1];
-                            volumeNormals[ indexVertex ] = data[offset+4];
-                            indexVertex ++;
-                            volumePositions[ indexVertex ] = data[offset+2];
-                            volumeNormals[ indexVertex ] = data[offset+5];
-                            indexVertex ++;
-                            volumePositions[ indexVertex ] = data[offset+3];
-                            volumeNormals[ indexVertex ] = data[offset+6];
-
-                    }
-                    offset += 6;
-                }
-                offset += 1;
-
-                object.geometry.attributes.position.needsUpdate = true;
-                object.geometry.attributes.normal.needsUpdate = true;
-            }
-            
-        },
         
-        _updateVehicles : function( data ) {
-		var vehicle, wheel,
-			i, offset;
-
-		for ( i = 0; i < ( data.length - 1 ) / VEHICLEREPORT_ITEMSIZE; i++ ) {
-			offset = 1 + i * VEHICLEREPORT_ITEMSIZE;
-			vehicle = this._vehicles[ data[ offset ] ];
-
-			if ( vehicle === undefined ) {
-				continue;
-			}
-
-			wheel = vehicle.wheels[ data[ offset + 1 ] ];
-
-			wheel.position.set(
-				data[ offset + 2 ],
-				data[ offset + 3 ],
-				data[ offset + 4 ]
-			);
-
-			wheel.quaternion.set(
-				data[ offset + 5 ],
-				data[ offset + 6 ],
-				data[ offset + 7 ],
-				data[ offset + 8 ]
-			);
-		}
-
-		if ( SUPPORT_TRANSFERABLE ) {
-			// Give the typed array back to the worker
-			this._worker.transferableMessage( data.buffer, [data.buffer] );
-		}
-	},
         _updateConstraints : function( data ) {
 		var constraint, object,
 			i, offset;
@@ -49998,7 +49972,7 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , EventDispatcher
 			constraint.appliedImpulse = data[ offset + 5 ] ;
 		}
 
-		if ( SUPPORT_TRANSFERABLE ) {
+		if ( AddPhysics.SUPPORT_TRANSFERABLE ) {
 			// Give the typed array back to the worker
 			this._worker.transferableMessage( data.buffer, [data.buffer] );
 		}
@@ -50081,7 +50055,7 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , EventDispatcher
 								);
 							}
 
-							object.dispatchEvent( {type:'collision'}, object2, _temp1, _temp2, _temp_vector3_1$1 );
+							object.dispatchEvent( {type:'collision', detail:[ object2, _temp1, _temp2, _temp_vector3_1$1]} );
 						}
 					}
 				}
@@ -50097,7 +50071,7 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , EventDispatcher
 
 		this.collisions = collisions;
 
-		if ( SUPPORT_TRANSFERABLE ) {
+		if ( AddPhysics.SUPPORT_TRANSFERABLE ) {
 			// Give the typed array back to the worker
 			this._worker.transferableMessage( data.buffer, [data.buffer] );
 		}
@@ -50105,98 +50079,59 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , EventDispatcher
         addConstraint : function ( constraint, show_marker ) {
 		this._constraints[ constraint.id ] = constraint;
 		this.execute( 'addConstraint', constraint.getDefinition() );
+                
 
-		if ( show_marker ) {
-			var marker;
-
-			switch ( constraint.type ) {
-				case 'point':
-					marker = new Mesh(
-						new SphereGeometry( 1.5 ),
-						new MeshNormalMaterial
-					);
-					marker.position.copy( constraint.positiona );
-					this._objects[ constraint.objecta ].add( marker );
-					break;
-
-				case 'hinge':
-					marker = new Mesh(
-						new SphereGeometry( 1.5 ),
-						new MeshNormalMaterial
-					);
-					marker.position.copy( constraint.positiona );
-					this._objects[ constraint.objecta ].add( marker );
-					break;
-
-				case 'slider':
-					marker = new Mesh(
-						new BoxGeometry( 10, 1, 1 ),
-						new MeshNormalMaterial
-					);
-					marker.position.copy( constraint.positiona );
-					// This rotation isn't right if all three axis are non-0 values
-					// TODO: change marker's rotation order to ZYX
-					marker.rotation.set(
-						constraint.axis.y, // yes, y and
-						constraint.axis.x, // x axis are swapped
-						constraint.axis.z
-					);
-					this._objects[ constraint.objecta ].add( marker );
-					break;
-
-				case 'conetwist':
-					marker = new Mesh(
-						new SphereGeometry( 1.5 ),
-						new MeshNormalMaterial
-					);
-					marker.position.copy( constraint.positiona );
-					this._objects[ constraint.objecta ].add( marker );
-					break;
-
-				case 'dof':
-					marker = new Mesh(
-						new SphereGeometry( 1.5 ),
-						new MeshNormalMaterial
-					);
-					marker.position.copy( constraint.positiona );
-					this._objects[ constraint.objecta ].add( marker );
-					break;
-			}
+		if ( show_marker && typeof AddPhysics.addFunctions.constraint[constraint.type] === "function") {
+                    
+                    AddPhysics.addFunctions.constraint[constraint.type]( constraint );			
 		}
 
 		return constraint;
 	}
 });
+
 PhysicsWorld.addPhysics = function( scene, params ){
     scene.physicsWorld = new PhysicsWorld( scene, params );
     return scene.physicsWorld;
 };
 
-	PhysicsWorld.prototype.removeConstraint = function( constraint ) {
-		if ( this._constraints[constraint.id ] !== undefined ) {
-			this.execute( 'removeConstraint', { id: constraint.id } );
-			delete this._constraints[ constraint.id ];
-		}
-	};
+PhysicsWorld.prototype.removeConstraint = function( constraint ) {
+        if ( this._constraints[constraint.id ] !== undefined ) {
+                this.execute( 'removeConstraint', { id: constraint.id } );
+                delete this._constraints[ constraint.id ];
+        }
+};
 
-	PhysicsWorld.prototype.execute = function( cmd, params ) {
-		this._worker.postMessage({ cmd: cmd, params: params });
-	};
-        
+PhysicsWorld.prototype.execute = function( cmd, params ) {
+        this._worker.postMessage({ cmd: cmd, params: params });
+};
 
-	PhysicsWorld.prototype.setFixedTimeStep = function( fixedTimeStep ) {
-		if ( fixedTimeStep ) {
-			this.execute( 'setFixedTimeStep', fixedTimeStep );
-		}
-	};
 
-	PhysicsWorld.prototype.setGravity = function( gravity ) {
-		if ( gravity ) {
-			this.execute( 'setGravity', gravity );
-		}
-	};
-        
-        let Scene$1 = function( params ) {
+PhysicsWorld.prototype.setFixedTimeStep = function( fixedTimeStep ) {
+        if ( fixedTimeStep ) {
+                this.execute( 'setFixedTimeStep', fixedTimeStep );
+        }
+};
+
+PhysicsWorld.prototype.setGravity = function( gravity ) {
+        if ( gravity ) {
+                this.execute( 'setGravity', gravity );
+        }
+};
+
+/* 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+// Physijs.Scene
+
+const REPORT_ITEMSIZE$1 = 14;
+    
+    let _temp_matrix4_1$2 = new Matrix4();
+
+
+const Scene$1 = function( params ) {
 
     Scene.call( this );
     PhysicsWorld.call( this, this, params );
@@ -50221,13 +50156,65 @@ Scene$1.prototype = Object.assign( Object.create( Scene.prototype ), PhysicsWorl
     },
     
     remove : function( object ) {
-        this.onRemove( object );
+        Scene.prototype.remove.call( this, object );
+        //this.onRemove( object );
     }
 });
 
-Scene$1.scripts = {
-    ammo : 'ammo.js',
-    worker : 'physijs_worker.js'
+
+AddPhysics.updateFunctions._updateScene = function( data ) {
+    let num_objects = data[1],
+            object, _physijs,
+            offset;
+
+    for ( let i = 0; i < num_objects; i++ ) {
+            offset = 2 + i * REPORT_ITEMSIZE$1;
+            object = this._objects[ data[ offset ] ];
+
+            if ( object === undefined ) {
+                    continue;
+            }
+
+            _physijs = object.physicsBody._physijs;
+
+            if ( object.physicsBody.__dirtyPosition === false ) {
+                    object.position.set(
+                            data[ offset + 1 ],
+                            data[ offset + 2 ],
+                            data[ offset + 3 ]
+                    );
+            }
+
+            if ( object.physicsBody.__dirtyRotation === false ) {
+                    object.quaternion.set(
+                            data[ offset + 4 ],
+                            data[ offset + 5 ],
+                            data[ offset + 6 ],
+                            data[ offset + 7 ]
+                    );
+            }
+
+            _physijs.linearVelocity.set(
+                    data[ offset + 8 ],
+                    data[ offset + 9 ],
+                    data[ offset + 10 ]
+            );
+
+            _physijs.angularVelocity.set(
+                    data[ offset + 11 ],
+                    data[ offset + 12 ],
+                    data[ offset + 13 ]
+            );
+
+    }
+
+    if ( AddPhysics.SUPPORT_TRANSFERABLE ) {
+            // Give the typed array back to the worker
+            this._worker.transferableMessage( data.buffer, [data.buffer] );
+    }
+
+    AddPhysics.status._is_simulating = false;
+    this.dispatchEvent( {type : 'update'} );
 };
 
 /* 
@@ -51677,43 +51664,49 @@ function isEqual( x1, y1, z1, x2, y2, z2 ) {
 
 function processGeometry( bufGeometry ) {
     // Ony consider the position values when merging the vertices
-    var posOnlyBufGeometry = new BufferGeometry();
+    let posOnlyBufGeometry = new BufferGeometry();
     posOnlyBufGeometry.addAttribute( 'position', bufGeometry.getAttribute( 'position' ) );
     posOnlyBufGeometry.setIndex( bufGeometry.getIndex() );
+    
     // Merge the vertices so the triangle soup is converted to indexed triangles
-    var indexedBufferGeom = BufferGeometryUtils.mergeVertices( posOnlyBufGeometry );
+    let indexedBufferGeom = BufferGeometryUtils.mergeVertices( posOnlyBufGeometry );
+    
     // Create index arrays mapping the indexed vertices to bufGeometry vertices
     let ret = mapIndices( bufGeometry, indexedBufferGeom );
+    
     return ret;
 }
 
-    function mapIndices( bufGeometry, indexedBufferGeom ) {
-            // Creates ammoVertices, ammoIndices and ammoIndexAssociation in bufGeometry
-            let ret = {};
-            var vertices = bufGeometry.attributes.position.array;
-            var idxVertices = indexedBufferGeom.attributes.position.array;
-            var indices = indexedBufferGeom.index.array;
-            var numIdxVertices = idxVertices.length / 3;
-            var numVertices = vertices.length / 3;
-           
-            ret.ammoVertices = idxVertices;
-            ret.ammoIndices = indices;
-            ret.ammoIndexAssociation = [];
-            
-            for ( let i = 0; i < numIdxVertices; i ++ ) {
-                var association = [];
-                ret.ammoIndexAssociation.push( association );
-                var i3 = i * 3;
-                for ( let j = 0; j < numVertices; j ++ ) {
-                    var j3 = j * 3;
-                    if ( isEqual( idxVertices[ i3 ], idxVertices[ i3 + 1 ], idxVertices[ i3 + 2 ],
-                            vertices[ j3 ], vertices[ j3 + 1 ], vertices[ j3 + 2 ] ) ) {
-                            association.push( j3 );
-                    }
-                }
+function mapIndices( bufGeometry, indexedBufferGeom ) {
+    // Creates ammoVertices, ammoIndices and ammoIndexAssociation in bufGeometry
+    let ret = {};
+    var vertices = bufGeometry.attributes.position.array;
+    var idxVertices = indexedBufferGeom.attributes.position.array;
+    var indices = indexedBufferGeom.index.array;
+    var numIdxVertices = idxVertices.length / 3;
+    var numVertices = vertices.length / 3;
+
+    ret.ammoVertices = idxVertices;
+    ret.ammoIndices = indices;
+    ret.ammoIndexAssociation = [];
+
+    let association, i3, j3;
+
+    for ( let i = 0; i < numIdxVertices; i ++ ) {
+        association = [];
+        ret.ammoIndexAssociation.push( association );
+        i3 = i * 3;
+
+        for ( let j = 0; j < numVertices; j ++ ) {
+            j3 = j * 3;
+            if ( isEqual( idxVertices[ i3 ], idxVertices[ i3 + 1 ], idxVertices[ i3 + 2 ],
+                    vertices[ j3 ], vertices[ j3 + 1 ], vertices[ j3 + 2 ] ) ) {
+                    association.push( j3 );
             }
-        return ret;
+        }
     }
+    return ret;
+}
 
 let SoftMesh = function( geometry, material, mass, pressure ){
     
@@ -51727,7 +51720,57 @@ let SoftMesh = function( geometry, material, mass, pressure ){
 
 SoftMesh.prototype = Object.assign( Object.create( Mesh$1.prototype ), { 
     constructor : SoftMesh 
-});
+}); 
+
+AddPhysics.updateFunctions._updateSoftBodies = function( data ){
+            
+    const length = data[1];
+
+    let object;
+    let numVerts;
+
+    let offset =2;
+
+    for ( let i = 0, il = length; i < il; i ++ ) {
+
+        object = this._objects[ data[offset] ];
+        offset += 1;
+
+
+        let volumePositions = object.geometry.attributes.position.array;
+        let volumeNormals = object.geometry.attributes.normal.array;
+        let association = object._physijs.ammoIndexAssociation;
+        let assocVertex, indexVertex;
+
+        numVerts = data[offset];
+
+        for ( let j = 0; j < numVerts; j ++ ) {
+            assocVertex = association[ j ];
+
+            for ( let k = 0, kl = assocVertex.length; k < kl; k ++ ) {
+
+                indexVertex = assocVertex[ k ];
+                volumePositions[ indexVertex ] = data[offset+1];
+                volumeNormals[ indexVertex ] = data[offset+4];
+                
+                indexVertex++;
+                volumePositions[ indexVertex ] = data[offset+2];
+                volumeNormals[ indexVertex ] = data[offset+5];
+                
+                indexVertex++;
+                volumePositions[ indexVertex ] = data[offset+3];
+                volumeNormals[ indexVertex ] = data[offset+6];
+
+            }
+            offset += 6;
+        }
+        offset += 1;
+
+        object.geometry.attributes.position.needsUpdate = true;
+        object.geometry.attributes.normal.needsUpdate = true;
+    }
+            
+ };
 
 /* 
  * To change this license header, choose License Headers in Project Properties.
@@ -51796,7 +51839,7 @@ let Physijs = {
 
     Physijs.ConcaveMesh = ConcaveMesh;
 
-    Physijs.Scene.scripts = Physijs.scripts;
+    Physijs.PhysicsWorld.scripts = Physijs.scripts;
     Physijs.createMaterial = createMaterial;
 
     // Physijs.noConflict

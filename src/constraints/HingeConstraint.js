@@ -5,6 +5,17 @@
  */
 
 import { getObjectId, convertWorldPositionToObject } from "../physi_utils.js"
+import AddPhysics from '../AddPhysicsGlobals.js';
+import * as THREE from '../three.module.js';
+
+AddPhysics.addFunctions.constraint.hinge = function( constraint ){
+    let marker = new THREE.Mesh(
+            new THREE.SphereGeometry( 1.5 ),
+            new THREE.MeshNormalMaterial
+    );
+    marker.position.copy( constraint.positiona );
+    this._objects[ constraint.objecta ].add( marker );
+};
 
 let HingeConstraint = function( objecta, objectb, position, axis ) {
         if ( axis === undefined ) {
@@ -28,15 +39,15 @@ let HingeConstraint = function( objecta, objectb, position, axis ) {
         }
 };
 HingeConstraint.prototype.getDefinition = function() {
-        return {
-                type: this.type,
-                id: this.id,
-                objecta: this.objecta,
-                objectb: this.objectb,
-                positiona: this.positiona,
-                positionb: this.positionb,
-                axis: this.axis
-        };
+    return {
+            type: this.type,
+            id: this.id,
+            objecta: this.objecta,
+            objectb: this.objectb,
+            positiona: this.positiona,
+            positionb: this.positionb,
+            axis: this.axis
+    };
 };
 
 /*

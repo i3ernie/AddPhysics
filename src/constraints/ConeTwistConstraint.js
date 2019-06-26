@@ -5,7 +5,18 @@
  */
 
 import { getObjectId, convertWorldPositionToObject } from "../physi_utils.js"
+import AddPhysics from '../AddPhysicsGlobals.js';
 import * as THREE from "../three.module.js";
+
+AddPhysics.addFunctions.constraint.conetwist = function( constraint ){
+    let marker = new THREE.Mesh(
+            new THREE.SphereGeometry( 1.5 ),
+            new THREE.MeshNormalMaterial
+    );
+    marker.position.copy( constraint.positiona );
+    this._objects[ constraint.objecta ].add( marker );
+};
+
 
 let ConeTwistConstraint = function( objecta, objectb, position ) {
         if ( position === undefined ) {

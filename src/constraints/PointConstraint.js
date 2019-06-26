@@ -4,6 +4,17 @@
  * and open the template in the editor.
  */
 import { getObjectId, convertWorldPositionToObject } from "../physi_utils.js"
+import AddPhysics from '../AddPhysicsGlobals.js';
+import * as THREE from '../three.module.js';
+
+AddPhysics.addFunctions.constraint.point = function( constraint ){
+    let marker = new THREE.Mesh(
+            new THREE.SphereGeometry( 1.5 ),
+            new THREE.MeshNormalMaterial
+    );
+    marker.position.copy( constraint.positiona );
+    this._objects[ constraint.objecta ].add( marker );
+};
 
 
 let PointConstraint = function( objecta, objectb, position ) {

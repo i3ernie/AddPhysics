@@ -79,9 +79,9 @@
 
                             constraintreport[ offset ] = index;
                             constraintreport[ offset + 1 ] = offset_body.id;
-                            constraintreport[ offset + 2 ] = origin.getX();
-                            constraintreport[ offset + 3 ] = origin.getY();
-                            constraintreport[ offset + 4 ] = origin.getZ();
+                            constraintreport[ offset + 2 ] = origin.getX? origin.getX(): origin.x();
+                            constraintreport[ offset + 3 ] = origin.getY? origin.getY(): origin.y();
+                            constraintreport[ offset + 4 ] = origin.getZ? origin.getZ(): origin.z();
                             constraintreport[ offset + 5 ] = constraint.getAppliedImpulse();
                     }
             }

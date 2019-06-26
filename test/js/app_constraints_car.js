@@ -10,7 +10,7 @@ import * as THREE from "../../src/three.module.js";
 import Stats from "./stats.module.js";
 
 Physijs.scripts.worker = '../src/AddPhysics_worker.js';
-Physijs.scripts.ammo = '../examples/js/ammo.js';
+Physijs.scripts.ammo = '../examples/js/ammolib.js';
 
 var initScene, render,
         ground_material, car_material, wheel_material, wheel_geometry,
@@ -38,12 +38,10 @@ var initScene, render,
 		
 		scene = new Physijs.Scene;
 		scene.setGravity(new THREE.Vector3( 0, -30, 0 ));
-		scene.addEventListener(	'update',
-			function( ev ) { 
+		scene.addEventListener(	'update', function( ev ) { 
 				scene.simulate( undefined, 2 );
 				physics_stats.update();
-			}
-		);
+		});
 		
 		camera = new THREE.PerspectiveCamera(
 			35,

@@ -73,14 +73,22 @@
     
     self.addEventListener("report", function() {
         
+        let softBody;
+        let numVerts;
+        let node;
+        let nodePos;
+        let nodeNormal;
+        
         let keys = Object.keys( _bodies );
-        if(keys.length < 1) return;
+        let offset = 2;
+        
+        if( keys.length < 1 ) {
+            return;
+        }
         
         report = [];
         report[0] = MESSAGE_TYPES.SOFTREPORT;
         report[1] = keys.length;
-        let offset = 2;
-        let softBody;
 
         // Update soft volumes
         for ( let i = 0, il = keys.length; i < il; i ++ ) {
@@ -89,29 +97,27 @@
             report[ offset ] = keys[i];
             offset += 1;
 
-            var association = _descriptions[ softBody.id ].ammoIndexAssociation;
-            var numVerts = association.length;
-            var nodes = softBody.get_m_nodes();
+            numVerts = _descriptions[ softBody.id ].ammoIndexAssociation.length;
 
             report[ offset ] = numVerts;
             
-            for ( var j = 0; j < numVerts; j ++ ) {
+            
+            for ( let j = 0; j < numVerts; j ++ ) {
 
-                    var node = nodes.at( j );
+                    node = softBody.get_m_nodes().at( j );
 
-                    var nodePos = node.get_m_x();			
-                    report[offset+1] = nodePos.x();
-                    report[offset+2] = nodePos.y();
-                    report[offset+3] = nodePos.z();
+                    nodePos = node.get_m_x();			
+                    report[++offset] = nodePos.x();
+                    report[++offset] = nodePos.y();
+                    report[++offset] = nodePos.z();
 
-                    var nodeNormal = node.get_m_n();
-                    report[offset+4] = nodeNormal.x();
-                    report[offset+5] = nodeNormal.y();
-                    report[offset+6] = nodeNormal.z();
+                    nodeNormal = node.get_m_n();
+                    report[++offset] = nodeNormal.x();
+                    report[++offset] = nodeNormal.y();
+                    report[++offset] = nodeNormal.z();
 
-                    offset += 6;
             }
-            offset += 1;					
+            offset++;					
         }
         
 	transferableMessage( report );

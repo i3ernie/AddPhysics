@@ -1,8 +1,6 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.AddPhysics = {})));
-}(this, (function (exports) { 'use strict';
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
 
 // Polyfills
 
@@ -49881,7 +49879,7 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , EventDispatcher
         } 
     },
     
-    onRemove : function( object ) { 
+    onRemove : function( object ) {
         
         let _physijs = object.physicsBody._physijs;
        
@@ -50160,8 +50158,7 @@ Scene$1.prototype = Object.assign( Object.create( Scene.prototype ), PhysicsWorl
     },
     
     remove : function( object ) {
-        Scene.prototype.remove.call( this, object );
-        //this.onRemove( object );
+        this.onRemove( object );
     }
 });
 
@@ -51856,7 +51853,3 @@ exports['default'] = Physijs;
 exports.Physijs = Physijs;
 exports.THREE = three_module;
 exports.createMaterial = createMaterial;
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-})));

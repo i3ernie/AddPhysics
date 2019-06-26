@@ -1,18 +1,19 @@
 {
     "name": "AddPhysics",
-    "version": "0.6.3",
+    "version": "0.6.26",
     "keywords": [
         "util",
         "functional",
-        "server",
         "client",
         "browser"
     ],
+    
     "author": "bernie",
     "contributors": [],
     "dependencies": {
-        "three": "^0.105.1"
+        "three": "^0.105"
     },
+    
     "devDependencies": {
         "gulp": "latest",
         "gulp-concat": "latest",

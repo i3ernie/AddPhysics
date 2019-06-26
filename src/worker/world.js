@@ -92,7 +92,7 @@
             _quat.setZ(description.rotation.z);
             _quat.setW(description.rotation.w);
             _transform.setRotation(_quat);
-        
+            
 
             motionState = new Ammo.btDefaultMotionState( _transform ); // #TODO: btDefaultMotionState supports center of mass offset as second argument - implement
             rbInfo = new Ammo.btRigidBodyConstructionInfo( description.mass, motionState, shape, _vec3_1 );
@@ -103,7 +103,11 @@
             }
 
             body = new Ammo.btRigidBody( rbInfo );
-            Ammo.destroy(rbInfo);
+            Ammo.destroy( rbInfo );
+            
+            if ( description.activationState ){ 
+                body.setActivationState( description.activationState );
+            }
         
 
             if ( typeof description.collision_flags !== 'undefined' ) {

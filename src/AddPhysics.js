@@ -2,12 +2,13 @@
 'use strict';
 import DOFConstraint from "./constraints/dof_constraint.js";
 import PointConstraint from "./constraints/PointConstraint.js";
-import SliderConstraint from "./constraints/slider_constraint.js";
-import HingeConstraint from "./constraints/hinge_constraint.js";
+import SliderConstraint from "./constraints/SliderConstraint.js";
+import HingeConstraint from "./constraints/HingeConstraint.js";
 import ConeTwistConstraint from "./constraints/ConeTwistConstraint.js";
 
 import { convertWorldPositionToObject, getObjectId } from './physi_utils.js';
-import { Scene, PhysicsWorld } from './PhysicsScene.js';
+import Scene from './AddPhysicsScene.js';
+import PhysicsWorld from './AddPhysicsWorld.js';
 import { Vehicle, VehicleTuning } from './PhysicsVehicle.js';
 
 import Mesh from './bodies/PhysiMesh.js';
@@ -45,24 +46,24 @@ let Physijs = {
         ObjectBody : ObjectBody,
         
         //bodies
-        BoxMesh : BoxMesh,
-        BoxBody : BoxBody,
-        CapsuleMesh : CapsuleMesh,
-        CapsuleBody : CapsuleBody,
-        ConeMesh : ConeMesh,
-        ConeBody : ConeBody,
-        ConvexMesh : ConvexMesh,
-        ConvexBody : ConvexBody,
-        CylinderMesh : CylinderMesh,
-        CylinderBody : CylinderBody,
+        BoxMesh         : BoxMesh,
+        BoxBody         : BoxBody,
+        CapsuleMesh     : CapsuleMesh,
+        CapsuleBody     : CapsuleBody,
+        ConeMesh        : ConeMesh,
+        ConeBody        : ConeBody,
+        ConvexMesh      : ConvexMesh,
+        ConvexBody      : ConvexBody,
+        CylinderMesh    : CylinderMesh,
+        CylinderBody    : CylinderBody,
         HeightfieldMesh : HeightfieldMesh,
         HeightfieldBody : HeightfieldBody,
-        PlaneMesh : PlaneMesh,
-        PlaneBody : PlaneBody,
-        SphereMesh : SphereMesh,
-        SphereBody : SphereBody,
-        SoftMesh : SoftMesh,
-        SoftBody : SoftBody,
+        PlaneMesh       : PlaneMesh,
+        PlaneBody       : PlaneBody,
+        SphereMesh      : SphereMesh,
+        SphereBody      : SphereBody,
+        SoftMesh        : SoftMesh,
+        SoftBody        : SoftBody,
         
         Vehicle : Vehicle,
         VehicleTuning : VehicleTuning
@@ -70,13 +71,13 @@ let Physijs = {
 
     Physijs.ConcaveMesh = ConcaveMesh;
 
-    Physijs.Scene.scripts = Physijs.scripts;
+    Physijs.PhysicsWorld.scripts = Physijs.scripts;
     Physijs.createMaterial = createMaterial;
 
     // Physijs.noConflict
     Physijs.noConflict = function() {
-            window.Physijs = _Physijs;
-            return Physijs;
+        window.Physijs = _Physijs;
+        return Physijs;
     };
 
 export default Physijs;

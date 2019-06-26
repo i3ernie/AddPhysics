@@ -6,6 +6,9 @@
 
 import * as THREE from './three.module.js';
 import { getObjectId } from './physi_utils.js';
+import AddPhysics from './AddPhysicsGlobals.js';
+
+const VEHICLEREPORT_ITEMSIZE = 9;
 
 // Physijs.Vehicle
 let Vehicle = function( mesh, tuning ) {
@@ -82,40 +85,39 @@ let VehicleTuning = function( suspension_stiffness, suspension_compression, susp
         this.friction_slip = friction_slip !== undefined ? friction_slip : 10.5;
         this.max_suspension_force = max_suspension_force !== undefined ? max_suspension_force : 6000;
 };
-/*
-    _updateVehicles = function( data ) {
-            var vehicle, wheel,
-                    i, offset;
 
-            for ( i = 0; i < ( data.length - 1 ) / VEHICLEREPORT_ITEMSIZE; i++ ) {
-                    offset = 1 + i * VEHICLEREPORT_ITEMSIZE;
-                    vehicle = this._vehicles[ data[ offset ] ];
+AddPhysics.updateFunctions._updateVehicles = function( data ) {
+        let vehicle, wheel, offset;
 
-                    if ( vehicle === undefined ) {
-                            continue;
-                    }
+        for ( let i = 0; i < ( data.length - 1 ) / VEHICLEREPORT_ITEMSIZE; i++ ) {
+                offset = 1 + i * VEHICLEREPORT_ITEMSIZE;
+                vehicle = this._vehicles[ data[ offset ] ];
 
-                    wheel = vehicle.wheels[ data[ offset + 1 ] ];
+                if ( vehicle === undefined ) {
+                    continue;
+                }
 
-                    wheel.position.set(
-                            data[ offset + 2 ],
-                            data[ offset + 3 ],
-                            data[ offset + 4 ]
-                    );
+                wheel = vehicle.wheels[ data[ offset + 1 ] ];
 
-                    wheel.quaternion.set(
-                            data[ offset + 5 ],
-                            data[ offset + 6 ],
-                            data[ offset + 7 ],
-                            data[ offset + 8 ]
-                    );
-            }
+                wheel.position.set(
+                    data[ offset + 2 ],
+                    data[ offset + 3 ],
+                    data[ offset + 4 ]
+                );
 
-            if ( SUPPORT_TRANSFERABLE ) {
-                    // Give the typed array back to the worker
-                    this._worker.transferableMessage( data.buffer, [data.buffer] );
-            }
-    };
-        */
+                wheel.quaternion.set(
+                    data[ offset + 5 ],
+                    data[ offset + 6 ],
+                    data[ offset + 7 ],
+                    data[ offset + 8 ]
+                );
+        }
+
+        if ( AddPhysics.SUPPORT_TRANSFERABLE ) {
+                // Give the typed array back to the worker
+                this._worker.transferableMessage( data.buffer, [data.buffer] );
+        }
+};
+
 export { Vehicle, VehicleTuning };
 

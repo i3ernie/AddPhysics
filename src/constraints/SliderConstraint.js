@@ -4,6 +4,24 @@
  * and open the template in the editor.
  */
 import { getObjectId, convertWorldPositionToObject } from "../physi_utils.js"
+import AddPhysics from '../AddPhysicsGlobals.js';
+import * as THREE from '../three.module.js';
+
+AddPhysics.addFunctions.constraint.slider = function( constraint ){
+    let marker = new THREE.Mesh(
+            new THREE.BoxGeometry( 10, 1, 1 ),
+            new THREE.MeshNormalMaterial
+    );
+    marker.position.copy( constraint.positiona );
+    // This rotation isn't right if all three axis are non-0 values
+    // TODO: change marker's rotation order to ZYX
+    marker.rotation.set(
+            constraint.axis.y, // yes, y and
+            constraint.axis.x, // x axis are swapped
+            constraint.axis.z
+    );
+    this._objects[ constraint.objecta ].add( marker );
+};
 
 let SliderConstraint = function( objecta, objectb, position, axis ) {
         if ( axis === undefined ) {

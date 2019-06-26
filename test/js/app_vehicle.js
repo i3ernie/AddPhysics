@@ -39,33 +39,30 @@
 		
 		scene = new Physijs.Scene;
 		scene.setGravity(new THREE.Vector3( 0, -30, 0 ));
-		scene.addEventListener(
-			'update',
-			function() {
+		scene.addEventListener( 'update',function() {
 
-				if ( input && vehicle ) {
-					if ( input.direction !== null ) {
-						input.steering += input.direction / 50;
-						if ( input.steering < -.6 ) input.steering = -.6;
-						if ( input.steering > .6 ) input.steering = .6;
-					}
-					vehicle.setSteering( input.steering, 0 );
-					vehicle.setSteering( input.steering, 1 );
+                        if ( input && vehicle ) {
+                                if ( input.direction !== null ) {
+                                        input.steering += input.direction / 50;
+                                        if ( input.steering < -.6 ) input.steering = -.6;
+                                        if ( input.steering > .6 ) input.steering = .6;
+                                }
+                                vehicle.setSteering( input.steering, 0 );
+                                vehicle.setSteering( input.steering, 1 );
 
-					if ( input.power === true ) {
-						vehicle.applyEngineForce( 300 );
-					} else if ( input.power === false ) {
-						vehicle.setBrake( 20, 2 );
-						vehicle.setBrake( 20, 3 );
-					} else {
-						vehicle.applyEngineForce( 0 );
-					}
-				}
+                                if ( input.power === true ) {
+                                        vehicle.applyEngineForce( 300 );
+                                } else if ( input.power === false ) {
+                                        vehicle.setBrake( 20, 2 );
+                                        vehicle.setBrake( 20, 3 );
+                                } else {
+                                        vehicle.applyEngineForce( 0 );
+                                }
+                        }
 
-				scene.simulate( undefined, 2 );
-				physics_stats.update();
-			}
-		);
+                        scene.simulate( undefined, 2 );
+                        physics_stats.update();
+		});
 		
 		camera = new THREE.PerspectiveCamera(
 			35,
@@ -86,7 +83,7 @@
 		light.shadow.camera.bottom = 150;
 		light.shadow.camera.near = 20;
 		light.shadowCameraFar = 400;
-		light.shadow.bias = -.001
+		light.shadow.bias = -.001;
 		light.shadow.mapSize.width = light.shadow.mapSize.height = 2048;
 		scene.add( light );
 
@@ -117,7 +114,7 @@
 		var NoiseGen = new SimplexNoise;
 
 		var ground_geometry = new THREE.PlaneGeometry( 300, 300, 100, 100 );
-		for ( var i = 0; i < ground_geometry.vertices.length; i++ ) {
+		for ( let i = 0; i < ground_geometry.vertices.length; i++ ) {
 			var vertex = ground_geometry.vertices[i];
 			//vertex.y = NoiseGen.noise( vertex.x / 30, vertex.z / 30 ) * 1;
 		}
@@ -135,7 +132,7 @@
 		ground.receiveShadow = true;
 		scene.add( ground );
 
-		for ( i = 0; i < 50; i++ ) {
+		for ( let i = 0; i < 50; i++ ) {
 			var size = Math.random() * 2 + .5;
 			var box = new Physijs.BoxMesh(
 				new THREE.BoxGeometry( size, size, size ),
@@ -154,7 +151,7 @@
 		var json_loader = new LegacyJSONLoader();
 
 		json_loader.load( "models/mustang.js", function( car, car_materials ) {
-			json_loader.load( "models/mustang_wheel.js", function( wheel, wheel_materials ) {
+			json_loader.load( "models/mustang_wheel.js", function( wheel, wheel_materials ) { 
 				var mesh = new Physijs.BoxMesh(
 					car,
 					new THREE.MeshFaceMaterial( car_materials )
@@ -174,7 +171,7 @@
 
 				var wheel_material = new THREE.MeshFaceMaterial( wheel_materials );
 
-				for ( var i = 0; i < 4; i++ ) {
+				for ( let i = 0; i < 4; i++ ) {
 					vehicle.addWheel(
 						wheel,
 						wheel_material,
