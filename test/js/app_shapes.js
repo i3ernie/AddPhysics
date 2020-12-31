@@ -13,7 +13,7 @@ import Stats from "./stats.module.js";
 import TWEEN from "./tween.js";
 
 Physijs.scripts.worker = '../src/AddPhysics_worker.js';
-Physijs.scripts.ammo = '../examples/js/ammo.js';
+Physijs.scripts.ammo = '../test/js/ammo.js';
 	
 	
 	var initScene, render, createShape, loader,

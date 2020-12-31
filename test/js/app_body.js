@@ -7,17 +7,16 @@
 'use strict';
 
 import Physijs from "../../src/AddPhysics.js";
-import * as THREE from "../../src/three.module.js";
-import Stats from "./stats.module.js";
+import * as THREE from "../../node_modules/three/build/three.module.js";
+import Stats from "../../node_modules/stats.js/src/Stats.js";
 	
 Physijs.scripts.worker = '../src/AddPhysics_worker.js';
-Physijs.scripts.ammo = '../examples/js/ammo.js';
+Physijs.scripts.ammo = '../../node_modules/ammo.js/ammo.js';
 
-var initScene, render, applyForce, setMousePosition, mouse_position,
-        ground_material, box_material, loader,
+var  mouse_position, ground_material, box_material, loader,
         renderer, render_stats, physics_stats, scene, ground, light, camera, box, boxes = [];
 
-initScene = function() {
+const initScene = function() {
         renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.shadowMap.enabled = true;
@@ -36,16 +35,13 @@ initScene = function() {
         physics_stats.domElement.style.zIndex = 100;
         document.getElementById( 'viewport' ).appendChild( physics_stats.domElement );
 
-        scene = new Physijs.Scene;
+        scene = new Physijs.Scene();
         scene.setGravity(new THREE.Vector3( 0, -30, 0 ));
-        scene.addEventListener(
-                'update',
-                function() {
-                        applyForce();
-                        scene.simulate( undefined, 1 );
-                        physics_stats.update();
-                }
-        );
+        scene.addEventListener( 'update', function() {
+                applyForce();
+                scene.simulate( undefined, 1 );
+                physics_stats.update();
+        } );
 
         camera = new THREE.PerspectiveCamera(
                 35,
@@ -102,7 +98,7 @@ initScene = function() {
         ground.receiveShadow = true;
         scene.add( ground );
 
-        for ( var i = 0; i < 10; i++ ) {
+        for ( let i = 0; i < 10; i++ ) {
                 box = new Physijs.BoxMesh(
                         new THREE.BoxGeometry( 4, 4, 4 ),
                         box_material
@@ -133,13 +129,13 @@ initScene = function() {
         scene.simulate();
 };
 
-render = function() {
+const render = function() {
         requestAnimationFrame( render );
         renderer.render( scene, camera );
         render_stats.update();
 };
 
-setMousePosition = function( evt ) {
+const setMousePosition = function( evt ) {
         // Find where mouse cursor intersects the ground plane
         var vector = new THREE.Vector3(
                 ( evt.clientX / renderer.domElement.clientWidth ) * 2 - 1,
@@ -153,7 +149,7 @@ setMousePosition = function( evt ) {
         mouse_position = camera.position.clone().add( vector.multiplyScalar( coefficient ) );
 };
 
-applyForce = function() {
+const applyForce = function() {
         if (!mouse_position) return;
         var strength = 35, distance, effect, offset, box;
 

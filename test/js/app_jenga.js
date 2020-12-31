@@ -1,15 +1,12 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 'use strict';
-        
-        import {Physijs, THREE} from "../../../dist/THREEAddPhysics.module.js";
-        import Stats from "./libs/stats.module.js";
+
+import Physijs from "../../src/AddPhysics.js";
+import * as THREE from "../../node_modules/three/build/three.module.js";
+import Stats from "../../node_modules/stats.js/src/Stats.js";
 	
-	Physijs.scripts.worker = '../../dist/AddPhysicsWorkerAmmo.js';
+Physijs.scripts.worker = '../src/AddPhysics_worker.js';
+Physijs.scripts.ammo = '../../node_modules/ammo.js/ammo.js';
+
 
 	
 	var initScene, initEventHandling, render, createTower, loader,
@@ -95,7 +92,7 @@
 		
 		// Materials
 		table_material = Physijs.createMaterial(
-			new THREE.MeshLambertMaterial({ map: loader.load( '../textures/wood.jpg' )}),
+			new THREE.MeshLambertMaterial({ map: loader.load( 'images/wood.jpg' )}),
 			.9, // high friction
 			.2 // low restitution
 		);
@@ -103,7 +100,7 @@
 		table_material.map.repeat.set( 5, 5 );
 		
 		block_material = Physijs.createMaterial(
-			new THREE.MeshLambertMaterial({ map: loader.load( '../textures/plywood.jpg' )}),
+			new THREE.MeshLambertMaterial({ map: loader.load( 'images/plywood.jpg' )}),
 			.4, // medium friction
 			.4 // medium restitution
 		);

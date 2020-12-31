@@ -1,19 +1,19 @@
 {
     "name": "AddPhysics",
-    "version": "0.6.26",
+    "version": "0.124.2",
     "keywords": [
         "util",
         "functional",
         "client",
         "browser"
     ],
-    
     "author": "bernie",
     "contributors": [],
     "dependencies": {
-        "three": "^0.105"
+        "ammo.js": "latest",
+        "stats.js": "latest",
+        "three": "^0.124"
     },
-    
     "devDependencies": {
         "gulp": "latest",
         "gulp-concat": "latest",

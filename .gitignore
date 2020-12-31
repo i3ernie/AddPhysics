@@ -61,3 +61,6 @@ typings/
 .next
 /nbproject/private/
 /nbproject/
+package-lock.json
+package-lock.json
+.gitignore

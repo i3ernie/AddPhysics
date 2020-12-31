@@ -7,11 +7,11 @@
 'use strict';
 
 import Physijs from "../../src/AddPhysics.js";
-import * as THREE from "../../src/three.module.js";
-import Stats from "./stats.module.js";
+import * as THREE from "../../node_modules/three/build/three.module.js";
+import Stats from "../../node_modules/stats.js/src/Stats.js";
 	
 	Physijs.scripts.worker = '../src/AddPhysics_worker.js';
-	Physijs.scripts.ammo = '../examples/js/ammo.js';
+	Physijs.scripts.ammo = '../../node_modules/ammo.js/ammo.js';
 	
 	var initScene, render, _boxes = [], spawnBox, loader,
 		renderer, render_stats, physics_stats, scene, ground_material, ground, light, camera;

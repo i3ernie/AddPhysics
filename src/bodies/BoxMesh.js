@@ -35,7 +35,7 @@ const Body = function( mesh, opt ) {
     _make.call( this, mesh, opt );    
 };
 
-Body.prototype = Object.assign({}, PhysicsBody.prototype, {
+Body.prototype = Object.assign( Object.create( PhysicsBody.prototype ), {
     constructor : Body
 });
 
@@ -43,7 +43,7 @@ Body.addPhysics = function( mesh, opt ){
     PhysicsBody.add( Body, mesh, opt );
 };
 
-let BoxMesh = function( geometry, material, mass ) {
+const BoxMesh = function( geometry, material, mass ) {
 
     Mesh.call( this, geometry, material, mass );
     _make.call( this, this, {mass:mass} );

@@ -10,7 +10,7 @@ import * as THREE from "../../src/three.module.js";
 import Stats from "./stats.module.js";
 
 Physijs.scripts.worker = '../src/AddPhysics_worker.js';
-Physijs.scripts.ammo = '../examples/js/ammolib.js';
+Physijs.scripts.ammo = '../test/js/ammo.wasm.js';
 
 var initScene, render,
         ground_material, car_material, wheel_material, wheel_geometry,
