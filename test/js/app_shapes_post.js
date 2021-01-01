@@ -7,7 +7,8 @@
 'use strict';
 
 import Physijs from "../../src/AddPhysics.js";
-import * as THREE from "../../src/three.module.js";
+import * as THREE from "../../node_modules/three/build/three.module.js";
+//import * as THREE from "../../src/three.module.js";
 
 import Stats from "./stats.module.js";
 import TWEEN from "./tween.js";
@@ -16,10 +17,10 @@ Physijs.scripts.worker = '../src/AddPhysics_worker.js';
 Physijs.scripts.ammo = '../examples/js/ammo.js';
 	
 	
-	var initScene, render, createShape, loader,
+	var loader,
 		renderer, render_stats, physics_stats, scene, physicsWorld, light, ground, ground_material, camera;
 	
-	initScene = function() {
+	const initScene = function() {
             TWEEN.start();
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -47,17 +48,12 @@ Physijs.scripts.ammo = '../examples/js/ammo.js';
                 gravity : new THREE.Vector3( 0, -9.81, 0 ) 
             });
 
-            physicsWorld.addEventListener( 'update', function() {
+            physicsWorld.addEventListener( 'update', function() { 
                     physicsWorld.simulate( undefined, 2 );
                     physics_stats.update();
             });
 
-            camera = new THREE.PerspectiveCamera(
-                    35,
-                    window.innerWidth / window.innerHeight,
-                    1,
-                    1000
-            );
+            camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 1000 );
             camera.position.set( 60, 50, 60 );
             camera.lookAt( scene.position );
             scene.add( camera );
@@ -142,13 +138,13 @@ Physijs.scripts.ammo = '../examples/js/ammo.js';
             createShape();
 	};
 	
-	render = function() {
+	const render = function() {
             requestAnimationFrame( render );
             renderer.render( scene, camera );
             render_stats.update();
 	};
 	
-	createShape = (function() {
+	const createShape = (function() { 
             var addshapes = true,
                     shapes = 0,
                     geos =[
@@ -168,7 +164,7 @@ Physijs.scripts.ammo = '../examples/js/ammo.js';
                         var button = document.getElementById( 'stop' );
                         if ( button ) {
                                 button.addEventListener( 'click', function() { addshapes = !addshapes; } );
-                        } else {
+                        } else { 
                                 setTimeout( addListener );
                         }
                     }
@@ -198,7 +194,7 @@ Physijs.scripts.ammo = '../examples/js/ammo.js';
                     );
 
                     if ( addshapes ) { 
-                        shape.addEventListener( 'ready', function(){ setTimeout(createShape, 500); } );
+                        shape.addEventListener( 'ready', function(){ console.log("ready"); setTimeout(createShape, 500); } );
                     }
 
                     scene.add( shape );
