@@ -5,33 +5,24 @@
  */
 
 'use strict';
-        import Physijs from "../../src/AddPhysics.js";
-        import * as THREE from "../../src/three.module.js";
-        import Stats from "./stats.module.js";
+import {Physijs, THREE} from "../../src/AddPhysics.js";
+import {render_stats, physics_stats} from "./extras/renderStats.module.js"
 	
 	Physijs.scripts.worker = '../src/AddPhysics_worker.js';
 	Physijs.scripts.ammo = '../examples/js/ammo.js';
 	
-	var initScene, render, renderer, render_stats, physics_stats, scene, ground, light, camera, spawnChair,
+	var render, renderer, scene, ground, light, camera, 
 		ground_material, chair_material, loader;
 	
-	initScene = function() {
+	const initScene = function() {
 		renderer = new THREE.WebGLRenderer({ antialias: true });
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		renderer.shadowMap.enabled = true;
 		renderer.shadowMapSoft = true;
 		document.getElementById( 'viewport' ).appendChild( renderer.domElement );
 		
-		render_stats = new Stats();
-		render_stats.domElement.style.position = 'absolute';
-		render_stats.domElement.style.top = '0px';
-		render_stats.domElement.style.zIndex = 100;
-		document.getElementById( 'viewport' ).appendChild( render_stats.domElement );
 		
-		physics_stats = new Stats();
-		physics_stats.domElement.style.position = 'absolute';
-		physics_stats.domElement.style.top = '50px';
-		physics_stats.domElement.style.zIndex = 100;
+		document.getElementById( 'viewport' ).appendChild( render_stats.domElement );
 		document.getElementById( 'viewport' ).appendChild( physics_stats.domElement );
 		
 		scene = new Physijs.Scene;
@@ -104,10 +95,10 @@
 		scene.simulate();
 	};
 	
-	spawnChair = (function() {
-		var buildBack, buildLegs, doSpawn;
+	const spawnChair = (function() {
+		var doSpawn;
 		
-		buildBack = function() {
+		const buildBack = function() {
 			var back, _object;
 			
 			back = new Physijs.BoxMesh(
@@ -152,7 +143,7 @@
 			return back;
 		};
 		
-		buildLegs = function() {
+		const buildLegs = function() {
 			var leg, _leg;
 			
 			// back left
