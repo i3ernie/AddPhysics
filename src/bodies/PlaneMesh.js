@@ -5,7 +5,6 @@
  */
 
 import { Mesh, PhysicsBody } from './PhysiMesh.js';
-import * as THREE from "../three.module.js";
 
 const _make = function( mesh, opt ){
     let geometry = mesh.geometry;
@@ -27,7 +26,7 @@ const Body = function( mesh, opt ){
     PhysicsBody.call( this, mesh, opt );
     _make.call( this, mesh, opt );
 };
-Body.prototype = Object.assign({}, PhysicsBody.prototype, {
+Body.prototype = Object.assign( Object.create( PhysicsBody.prototype ), {
     constructor : Body
 });
 
@@ -39,11 +38,12 @@ Body.addPhysics = function( mesh, opt ) {
 };
 
 // Physijs.PlaneMesh
-let PlaneMesh = function ( geometry, material, mass ) {
+const PlaneMesh = function ( geometry, material, mass ) {
         Mesh.call( this, geometry, material, mass );
         _make.call( this, this, { mass: mass } );
 };
-PlaneMesh.prototype = Object.create( Mesh.prototype );
-PlaneMesh.prototype.constructor = PlaneMesh;
+PlaneMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
+    constructor : PlaneMesh
+});
 
 export { PlaneMesh, Body as PlaneBody }

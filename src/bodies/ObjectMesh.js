@@ -5,7 +5,7 @@
  */
 
 import { PhysicsBody } from './PhysiMesh.js';
-import * as THREE from "../three.module.js";
+import {THREE} from "../libs.es6.js";
 
 import { BoxBody } from "./BoxMesh.js";
 import { SphereBody } from "./SphereMesh.js";

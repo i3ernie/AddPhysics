@@ -6,10 +6,9 @@ import SliderConstraint from "./constraints/SliderConstraint.js";
 import HingeConstraint from "./constraints/HingeConstraint.js";
 import ConeTwistConstraint from "./constraints/ConeTwistConstraint.js";
 
-import { convertWorldPositionToObject, getObjectId } from './physi_utils.js';
 import Scene from './AddPhysicsScene.js';
 import PhysicsWorld from './AddPhysicsWorld.js';
-import { Vehicle, VehicleTuning } from './PhysicsVehicle.js';
+import { Vehicle, VehicleTuning } from './extras/PhysicsVehicle.js';
 
 import Mesh from './bodies/PhysiMesh.js';
 import { ObjectMesh, ObjectBody } from './bodies/ObjectMesh.js';
@@ -26,10 +25,12 @@ import { SoftMesh, SoftBody } from './bodies/SoftMesh.js';
 
 import { createMaterial } from './PhysiMaterial.js';
 
-let _Physijs = window.Physijs; // used for noConflict method
+import AddPhysics from './AddPhysicsGlobals.js';
+
+import {THREE} from './libs.es6.js'
 
 // object assigned to window.Physijs
-let Physijs = { 
+let Physijs = Object.assign ({}, AddPhysics, { 
         scripts : {},
         Scene : Scene,
         PhysicsWorld : PhysicsWorld,
@@ -67,17 +68,14 @@ let Physijs = {
         
         Vehicle : Vehicle,
         VehicleTuning : VehicleTuning
-    }; 
+    }); 
 
     Physijs.ConcaveMesh = ConcaveMesh;
 
     Physijs.PhysicsWorld.scripts = Physijs.scripts;
     Physijs.createMaterial = createMaterial;
 
-    // Physijs.noConflict
-    Physijs.noConflict = function() {
-        window.Physijs = _Physijs;
-        return Physijs;
-    };
 
 export default Physijs;
+
+export {Physijs, THREE};

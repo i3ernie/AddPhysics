@@ -6,15 +6,14 @@
 
 'use strict';
 
-import Physijs from "../../src/AddPhysics.js";
-import * as THREE from "../../node_modules/three/build/three.module.js";
-import Stats from "../../node_modules/stats.js/src/Stats.js";
+import {Physijs, THREE} from "../../src/AddPhysics.js";
+import {render_stats, physics_stats} from "./extras/renderStats.module.js"
 	
 	Physijs.scripts.worker = '../src/AddPhysics_worker.js';
 	Physijs.scripts.ammo = '../../node_modules/ammo.js/ammo.js';
 	
-	var initScene, render, _boxes = [], spawnBox, loader,
-		renderer, render_stats, physics_stats, scene, ground_material, ground, light, camera;
+	var initScene, render, _boxes = [], spawnBox, loader = new THREE.TextureLoader(),
+		renderer, scene, ground_material, ground, light, camera;
 	
 	initScene = function() {
 		renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -23,27 +22,16 @@ import Stats from "../../node_modules/stats.js/src/Stats.js";
 		renderer.shadowMapSoft = true;
 		document.getElementById( 'viewport' ).appendChild( renderer.domElement );
 		
-		render_stats = new Stats();
-		render_stats.domElement.style.position = 'absolute';
-		render_stats.domElement.style.top = '0px';
-		render_stats.domElement.style.zIndex = 100;
-		document.getElementById( 'viewport' ).appendChild( render_stats.domElement );
 		
-		physics_stats = new Stats();
-		physics_stats.domElement.style.position = 'absolute';
-		physics_stats.domElement.style.top = '50px';
-		physics_stats.domElement.style.zIndex = 100;
+		document.getElementById( 'viewport' ).appendChild( render_stats.domElement );
 		document.getElementById( 'viewport' ).appendChild( physics_stats.domElement );
 
-		scene = new Physijs.Scene;
-		scene.setGravity(new THREE.Vector3( 0, -30, 0 ));
-		scene.addEventListener(
-			'update',
-			function() {
+		scene = new Physijs.Scene();
+		scene.setGravity( new THREE.Vector3( 0, -30, 0 ) );
+		scene.addEventListener( 'update', function() {
 				scene.simulate( undefined, 1 );
 				physics_stats.update();
-			}
-		);
+		});
 		
 		camera = new THREE.PerspectiveCamera(
 			35,
@@ -70,9 +58,6 @@ import Stats from "../../node_modules/stats.js/src/Stats.js";
 		light.shadowMapWidth = light.shadowMapHeight = 2048;
 		light.shadowDarkness = .7;
 		scene.add( light );
-
-		// Loader
-		loader = new THREE.TextureLoader();
 		
 		// Ground
 		ground_material = Physijs.createMaterial(
@@ -98,8 +83,8 @@ import Stats from "../../node_modules/stats.js/src/Stats.js";
 	};
 	
 	spawnBox = (function() {
-		var box_geometry = new THREE.BoxGeometry( 4, 4, 4 ),
-			handleCollision = function( collided_with, linearVelocity, angularVelocity ) {
+		var box_geometry = new THREE.BoxGeometry( 4, 4, 4 );
+		const handleCollision = function( collided_with, linearVelocity, angularVelocity ) { console.log(collided_with);
 				switch ( ++this.collisions ) {
 					
 					case 1:

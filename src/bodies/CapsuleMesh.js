@@ -5,7 +5,6 @@
  */
 
 import { Mesh, PhysicsBody } from './PhysiMesh.js';
-import * as THREE from "../three.module.js";
 
 const _make = function( mesh, opt ){
     
@@ -34,7 +33,7 @@ Body.prototype = Object.assign({}, PhysicsBody.prototype, {
     constructor : Body
 });
 Body.addPhysics = function( mesh, opt ){
-    if ( mesh.parent && mesh.parent instanceof THREE.Scene ) {
+    if ( mesh.parent && mesh.parent.type === "Scene" ) {
         mesh.parent.dispatchEvent({type:"physicsBodyAdded", object:mesh});
     }
 };

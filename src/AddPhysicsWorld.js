@@ -5,8 +5,8 @@
  */
 // Physijs.Scene
 
-import * as THREE from './three.module.js';
-import { Vehicle } from './PhysicsVehicle.js';
+import {THREE} from "./libs.es6.js";
+import { Vehicle } from './extras/PhysicsVehicle.js';
 import AddPhysics from './AddPhysicsGlobals.js';
 
 // constants
@@ -23,9 +23,7 @@ const  REPORT_ITEMSIZE = 14,
     CONSTRAINTREPORT_ITEMSIZE = 6;
     
     AddPhysics.status._is_simulating = false;
-    let    _temp1, _temp2,
-        _temp_vector3_1 = new THREE.Vector3(),
-        _temp_vector3_2 = new THREE.Vector3(),
+    let _temp_vector3_1 = new THREE.Vector3(),
         _temp_matrix4_1 = new THREE.Matrix4(),
         _quaternion_1 = new THREE.Quaternion();
 
@@ -33,6 +31,7 @@ const  REPORT_ITEMSIZE = 14,
 const addObjectChildren = function( parent, object ) 
 {
     let child;
+    
     for ( let i = 0; i < object.children.length; i++ ) 
     {
         child = object.children[i];
@@ -344,11 +343,11 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
 		 * If you feel inclined to make this better, please do so.
 		 */
 
-		var i, j, offset, object, _physijs, object2, _physijs2, id1, id2,
+		var offset, object, _physijs, object2, _physijs2, id1, id2,
 			collisions = {}, normal_offsets = {};
 
 		// Build collision manifest
-		for ( i = 0; i < data[1]; i++ ) {
+		for (let i = 0; i < data[1]; i++ ) {
 			offset = 2 + i * COLLISIONREPORT_ITEMSIZE;
 			object = data[ offset ];
 			object2 = data[ offset + 1 ];
@@ -374,14 +373,14 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
 			if ( collisions[ id1 ] ) {
 
 				// Clean up touches array
-				for ( j = 0; j < _physijs.touches.length; j++ ) {
+				for ( let j = 0; j < _physijs.touches.length; j++ ) {
 					if ( collisions[ id1 ].indexOf( _physijs.touches[j] ) === -1 ) {
 						_physijs.touches.splice( j--, 1 );
 					}
 				}
-
+                                let _temp1, _temp2;
 				// Handle each colliding object
-				for ( j = 0; j < collisions[ id1 ].length; j++ ) {
+				for ( let j = 0; j < collisions[ id1 ].length; j++ ) {
 					id2 = collisions[ id1 ][ j ];
 					object2 = this._objects[ id2 ];
                                         

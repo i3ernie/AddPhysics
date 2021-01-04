@@ -6,19 +6,18 @@
 
 'use strict';
 
-import Physijs from "../../src/AddPhysics.js";
-import * as THREE from "../../node_modules/three/build/three.module.js";
-//import * as THREE from "../../src/three.module.js";
+import {Physijs, THREE} from "../../src/AddPhysics.js";
 
-import Stats from "./stats.module.js";
+import * as stats from "./extras/renderStats.module.js";
 import TWEEN from "./tween.js";
+
 
 Physijs.scripts.worker = '../src/AddPhysics_worker.js';
 Physijs.scripts.ammo = '../examples/js/ammo.js';
 	
 	
-	var loader,
-		renderer, render_stats, physics_stats, scene, physicsWorld, light, ground, ground_material, camera;
+	var loader, addshapes = true,
+		renderer, scene, physicsWorld, light, ground, ground_material, camera;
 	
 	const initScene = function() {
             TWEEN.start();
@@ -29,17 +28,9 @@ Physijs.scripts.ammo = '../examples/js/ammo.js';
             renderer.shadowMapSoft = true;
             document.getElementById( 'viewport' ).appendChild( renderer.domElement );
 
-            render_stats = new Stats();
-            render_stats.domElement.style.position = 'absolute';
-            render_stats.domElement.style.top = '0px';
-            render_stats.domElement.style.zIndex = 100;
-            document.getElementById( 'viewport' ).appendChild( render_stats.domElement );
-
-            physics_stats = new Stats();
-            physics_stats.domElement.style.position = 'absolute';
-            physics_stats.domElement.style.top = '50px';
-            physics_stats.domElement.style.zIndex = 100;
-            document.getElementById( 'viewport' ).appendChild( physics_stats.domElement );
+            
+            document.getElementById( 'viewport' ).appendChild( stats.render_stats.domElement );
+            document.getElementById( 'viewport' ).appendChild( stats.physics_stats.domElement );
 
             scene = new THREE.Scene();
 
@@ -50,7 +41,7 @@ Physijs.scripts.ammo = '../examples/js/ammo.js';
 
             physicsWorld.addEventListener( 'update', function() { 
                     physicsWorld.simulate( undefined, 2 );
-                    physics_stats.update();
+                    stats.physics_stats.update();
             });
 
             camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -135,42 +126,40 @@ Physijs.scripts.ammo = '../examples/js/ammo.js';
             requestAnimationFrame( render );
             physicsWorld.simulate();
 
+            registerEvents();
+
             createShape();
 	};
 	
 	const render = function() {
             requestAnimationFrame( render );
             renderer.render( scene, camera );
-            render_stats.update();
-	};
+            stats.render_stats.update();
+    };
+    
+    const registerEvents = function(){
+           
+        let button = document.getElementById( 'stop' );
+        if ( button ) {
+                button.addEventListener( 'click', function() { addshapes = !addshapes; } );
+        }     
+        
+    };
 	
 	const createShape = (function() { 
-            var addshapes = true,
-                    shapes = 0,
-                    geos =[
-                        new THREE.BoxGeometry( 3, 3, 3 ),
-                        new THREE.SphereGeometry( 1.5, 32, 32 ),
-                        new THREE.CylinderGeometry( 2, 2, 1, 32 ),
-                        new THREE.ConeGeometry( 2, 4, 32 ),
-                        new THREE.OctahedronGeometry( 1.7, 1 ),
-                        new THREE.TorusKnotGeometry ( 1.7, .2, 32, 4 ),
-                        new THREE.TorusKnotGeometry ( 1.7, .2, 32, 4 )
-                    ],
-
-                    doCreateShape;
-		
-		setTimeout(
-                    function addListener() {
-                        var button = document.getElementById( 'stop' );
-                        if ( button ) {
-                                button.addEventListener( 'click', function() { addshapes = !addshapes; } );
-                        } else { 
-                                setTimeout( addListener );
-                        }
-                    }
-		);
+        var shapes = 0,
+            geos =[
+                new THREE.BoxGeometry( 3, 3, 3 ),
+                new THREE.SphereGeometry( 1.5, 32, 32 ),
+                new THREE.CylinderGeometry( 2, 2, 1, 32 ),
+                new THREE.ConeGeometry( 2, 4, 32 ),
+                new THREE.OctahedronGeometry( 1.7, 1 ),
+                new THREE.TorusKnotGeometry ( 1.7, .2, 32, 4 ),
+                new THREE.TorusKnotGeometry ( 1.7, .2, 32, 4 )
+            ];
+    
 			
-		doCreateShape = function() {
+		const doCreateShape = function() {
                     let shape, material = new THREE.MeshLambertMaterial({ opacity: 0, transparent: true });
                     let opt = {};
 			

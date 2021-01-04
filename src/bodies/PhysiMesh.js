@@ -6,8 +6,11 @@
 
 'use strict';
 
-import * as THREE from '../three.module.js'
 import { getObjectId } from '../physi_utils.js';
+import AddPhysics from '../AddPhysicsGlobals.js';
+import {THREE} from "../libs.es6.js";
+
+const options = AddPhysics.options;
 
 let defaults = {
     type : null,
@@ -43,9 +46,9 @@ let PhysicsBody = function( mesh, opt ){
     
 };
 
-PhysicsBody.add = function ( Body, mesh, opt ){
+PhysicsBody.add = function ( Body, mesh, opt ){ 
     mesh.physicsBody = new Body( mesh, opt );
-    if ( mesh.parent && mesh.parent instanceof THREE.Scene ) {
+    if ( mesh.parent && mesh.parent.type === "Scene" ) {
         mesh.parent.dispatchEvent({type:"physicsBodyAdded", object:mesh});
     };
     return mesh.physicsBody;

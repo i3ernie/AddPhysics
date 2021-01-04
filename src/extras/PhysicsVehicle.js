@@ -4,9 +4,9 @@
  * and open the template in the editor.
  */
 
-import * as THREE from './three.module.js';
-import { getObjectId } from './physi_utils.js';
-import AddPhysics from './AddPhysicsGlobals.js';
+import {THREE} from "../libs.es6.js";
+import { getObjectId } from '../physi_utils.js';
+import AddPhysics from '../AddPhysicsGlobals.js';
 
 const VEHICLEREPORT_ITEMSIZE = 9;
 

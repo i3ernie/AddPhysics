@@ -6,15 +6,14 @@
 
 'use strict';
 
-import Physijs from "../../src/AddPhysics.js";
-import * as THREE from "../../node_modules/three/build/three.module.js";
-import Stats from "../../node_modules/stats.js/src/Stats.js";
+import {Physijs, THREE} from "../../src/AddPhysics.js";
+import {render_stats, physics_stats} from "./extras/renderStats.module.js"
 	
 Physijs.scripts.worker = '../src/AddPhysics_worker.js';
 Physijs.scripts.ammo = '../../node_modules/ammo.js/ammo.js';
 
 var  mouse_position, ground_material, box_material, loader,
-        renderer, render_stats, physics_stats, scene, ground, light, camera, box, boxes = [];
+        renderer, scene, ground, light, camera, box, boxes = [];
 
 const initScene = function() {
         renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -23,16 +22,7 @@ const initScene = function() {
         renderer.shadowMapSoft = true;
         document.getElementById( 'viewport' ).appendChild( renderer.domElement );
 
-        render_stats = new Stats();
-        render_stats.domElement.style.position = 'absolute';
-        render_stats.domElement.style.top = '1px';
-        render_stats.domElement.style.zIndex = 100;
         document.getElementById( 'viewport' ).appendChild( render_stats.domElement );
-
-        physics_stats = new Stats();
-        physics_stats.domElement.style.position = 'absolute';
-        physics_stats.domElement.style.top = '50px';
-        physics_stats.domElement.style.zIndex = 100;
         document.getElementById( 'viewport' ).appendChild( physics_stats.domElement );
 
         scene = new Physijs.Scene();

@@ -1,6 +1,6 @@
 
 'use strict';
-import * as THREE from "./three.module.js";
+import {THREE} from "./libs.es6.js";
 import DOFConstraint from "./constraints/dof_constraint.js";
 import PointConstraint from "./constraints/PointConstraint.js";
 import SliderConstraint from "./constraints/SliderConstraint.js";
@@ -10,7 +10,7 @@ import ConeTwistConstraint from "./constraints/ConeTwistConstraint.js";
 import { convertWorldPositionToObject, getObjectId } from './physi_utils.js';
 import Scene from './AddPhysicsScene.js';
 import PhysicsWorld from './AddPhysicsWorld.js';
-import { Vehicle, VehicleTuning } from './PhysicsVehicle.js';
+import { Vehicle, VehicleTuning } from './extras/PhysicsVehicle.js';
 
 import Mesh from './bodies/PhysiMesh.js';
 import { ObjectMesh, ObjectBody } from './bodies/ObjectMesh.js';

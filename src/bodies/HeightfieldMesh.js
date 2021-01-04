@@ -5,7 +5,6 @@
  */
 
 import { Mesh, PhysicsBody } from './PhysiMesh.js';
-import * as THREE from "../three.module.js";
 
 const _make = function( mesh, opt ){
     let geometry = mesh.geometry;

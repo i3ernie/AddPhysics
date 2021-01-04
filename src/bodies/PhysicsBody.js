@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-import * as THREE from '../three.module.js';
+import {THREE} from "../libs.es6.js";
 import { getObjectId } from '../physi_utils.js';
 
 

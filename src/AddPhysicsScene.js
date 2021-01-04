@@ -5,20 +5,16 @@
  */
 // Physijs.Scene
 
-import * as THREE from './three.module.js';
-import { Vehicle } from './PhysicsVehicle.js';
+import {THREE} from "./libs.es6.js";
+import { Vehicle } from './extras/PhysicsVehicle.js';
 import PhysicsWorld from './AddPhysicsWorld.js';
 import AddPhysics from './AddPhysicsGlobals.js';
 
 
 
-const  REPORT_ITEMSIZE = 14;
+const REPORT_ITEMSIZE = 14;
     
-    let 
-        _temp1, _temp2,
-        _temp_vector3_1 = new THREE.Vector3(),
-        _temp_vector3_2 = new THREE.Vector3(),
-        _temp_matrix4_1 = new THREE.Matrix4(),
+    let _temp_vector3_1 = new THREE.Vector3(),
         _quaternion_1 = new THREE.Quaternion();
 
 
@@ -53,19 +49,17 @@ const addObjectChildren = function( parent, object ) {
 };
 
 
+class Scene extends THREE.Scene {   
+        constructor( params ) {
 
+            super();     
 
-        
-const Scene = function( params ) {
+            PhysicsWorld.call( this, this, params );
+            this.physicsWorld = this;
+        }
+}
 
-    THREE.Scene.call( this );
-    PhysicsWorld.call( this, this, params );
-    this.physicsWorld = this;
-	
-};
-
-Scene.prototype = Object.assign( Object.create( THREE.Scene.prototype ), PhysicsWorld.prototype, {
-    constructor : Scene,
+Object.assign(Scene.prototype, PhysicsWorld.prototype, {
     
     add : function( object ){
 

@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 
+let _Physijs = window.Physijs; // used for noConflict method
 
 let AddPhysics = {
     updateFunctions : {  
@@ -14,6 +15,16 @@ let AddPhysics = {
     SUPPORT_TRANSFERABLE : false,
     status : {
         _is_simulating : false
+    },
+    options : {
+
+    },
+    config : function( obj ){
+        Object.assign(AddPhysics.options, obj );
+    },
+    noConflict : function() {
+        window.Physijs = _Physijs;
+        return Physijs;
     }
 };
 

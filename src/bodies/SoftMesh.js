@@ -7,7 +7,7 @@
 'use strict';
 
 import { Mesh, PhysicsBody } from './PhysiMesh.js';
-import * as THREE from "../three.module.js";
+import {THREE} from "../libs.es6.js";
 import BufferGeometryUtils from "../utils/BufferGeometryUtils.js"
 import PhysicsWorld from "../AddPhysicsWorld.js"
 import AddPhysics from '../AddPhysicsGlobals.js';

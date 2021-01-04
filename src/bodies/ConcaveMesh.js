@@ -5,7 +5,6 @@
  */
 
 import { Mesh, PhysicsBody } from './PhysiMesh.js';
-import * as THREE from "../three.module.js";
 
 // Physijs.ConcaveMesh
 let ConcaveMesh = function( geometry, material, mass ) {
@@ -23,15 +22,7 @@ let ConcaveMesh = function( geometry, material, mass ) {
 
         for ( i = 0; i < geometry.faces.length; i++ ) {
                 face = geometry.faces[i];
-                if ( face instanceof THREE.Face3) {
-
-                        triangles.push([
-                                { x: vertices[face.a].x, y: vertices[face.a].y, z: vertices[face.a].z },
-                                { x: vertices[face.b].x, y: vertices[face.b].y, z: vertices[face.b].z },
-                                { x: vertices[face.c].x, y: vertices[face.c].y, z: vertices[face.c].z }
-                        ]);
-
-                } else if ( face instanceof THREE.Face4 ) {
+                if ( face.d ) {
 
                         triangles.push([
                                 { x: vertices[face.a].x, y: vertices[face.a].y, z: vertices[face.a].z },
@@ -45,6 +36,15 @@ let ConcaveMesh = function( geometry, material, mass ) {
                         ]);
 
                 }
+                else if ( face.c ) {
+
+                        triangles.push([
+                                { x: vertices[face.a].x, y: vertices[face.a].y, z: vertices[face.a].z },
+                                { x: vertices[face.b].x, y: vertices[face.b].y, z: vertices[face.b].z },
+                                { x: vertices[face.c].x, y: vertices[face.c].y, z: vertices[face.c].z }
+                        ]);
+
+                } 
         }
 
         width = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
@@ -55,7 +55,8 @@ let ConcaveMesh = function( geometry, material, mass ) {
         this._physijs.triangles = triangles;
         this._physijs.mass = (typeof mass === 'undefined') ? width * height * depth : mass;
 };
-ConcaveMesh.prototype = new Mesh;
-ConcaveMesh.prototype.constructor = ConcaveMesh;
+ConcaveMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
+        constructor : ConcaveMesh
+});
 
 export { ConcaveMesh }

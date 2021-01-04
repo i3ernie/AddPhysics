@@ -8,6 +8,7 @@
 // Physijs.createMaterial
 const createMaterial = function( material, friction, restitution ) {
         let physijs_material = function(){};
+        
         physijs_material.prototype = material;
         physijs_material = new physijs_material();
 
@@ -20,14 +21,19 @@ const createMaterial = function( material, friction, restitution ) {
         return physijs_material;
 };
 
+const defaults = {
+        friction : .8,
+        restitution : .2
+};
+
 const Material = function( material, opt ){
     
 };
 Material.addPhysics = function( material, opt ){
     material._physijs = {
                 id: material.id,
-                friction: opt.friction === undefined ? .8 : opt.friction,
-                restitution: opt.restitution === undefined ? .2 : opt.restitution
+                friction: opt.friction === undefined ? defaults.friction : opt.friction,
+                restitution: opt.restitution === undefined ? defaults.restitution : opt.restitution
     };
     return material;
 };
