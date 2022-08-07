@@ -17,6 +17,7 @@
     "devDependencies": {
         "gulp": "latest",
         "gulp-concat": "latest",
-        "gulp-rollup": "^2.16.2"
+        "gulp-rollup": "^2.16.2",
+        "three-viewport": "git+https://github.com/i3ernie/three-viewport.git"
     }
 }
