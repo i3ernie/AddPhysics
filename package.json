@@ -12,7 +12,7 @@
     "dependencies": {
         "ammo.js": "latest",
         "stats.js": "latest",
-        "three": "^0.124"
+        "three": "^0.132"
     },
     "devDependencies": {
         "gulp": "latest",

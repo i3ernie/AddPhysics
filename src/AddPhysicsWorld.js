@@ -64,28 +64,29 @@ const addObjectChildren = function( parent, object )
     }
 };
 
-const PhysicsWorld = function( scene, params ){
-    
-    let self = this;
-    
-    scene.addEventListener("physicsBodyAdded", function( event ){
-        self.onAdd( event.object );
-    });
-    //remove physicsBody
-    scene.addEventListener("physicsBodyRemoved", function( event ){
-        self.onRemove( event.object );
-    });
-    
-    this._worker = new Worker( PhysicsWorld.scripts.worker || 'physijs_worker.js' );
-    this._worker.transferableMessage = this._worker.webkitPostMessage || this._worker.postMessage;
-    this._materials_ref_counts = {};
-    this._objects = {};
-    this._vehicles = {};
-    this._constraints = {};
-    
-    let ab = new ArrayBuffer( 1 );
-    this._worker.transferableMessage( ab, [ab] );
-    AddPhysics.SUPPORT_TRANSFERABLE = ( ab.byteLength === 0 );
+class PhysicsWorld extends THREE.EventDispatcher {
+    constructor ( scene, params ){
+            super();
+                let self = this;
+                
+                scene.addEventListener("physicsBodyAdded", function( event ){
+                        self.onAdd( event.object );
+                });
+                //remove physicsBody
+                scene.addEventListener("physicsBodyRemoved", function( event ){
+                        self.onRemove( event.object );
+                });
+        
+                this._worker = new Worker( PhysicsWorld.scripts.worker || 'physijs_worker.js' );
+                this._worker.transferableMessage = this._worker.webkitPostMessage || this._worker.postMessage;
+                this._materials_ref_counts = {};
+                this._objects = {};
+                this._vehicles = {};
+                this._constraints = {};
+        
+                let ab = new ArrayBuffer( 1 );
+                this._worker.transferableMessage( ab, [ab] );
+                AddPhysics.SUPPORT_TRANSFERABLE = ( ab.byteLength === 0 );
 
         this._worker.onmessage = function ( event ) {
                 let _temp;
@@ -174,19 +175,18 @@ const PhysicsWorld = function( scene, params ){
         };
 
 
-        params = params || {};
-        params.ammo = PhysicsWorld.scripts.ammo || 'ammo.js';
-        params.fixedTimeStep = params.fixedTimeStep || 1 / 60;
-        params.rateLimit = params.rateLimit || true;
-        this.execute( 'init', params );
-        if ( params.gravity ) {
-            this.execute( 'setGravity', params.gravity );
-	}
-};
+                params = params || {};
+                params.ammo = PhysicsWorld.scripts.ammo || 'ammo.js';
+                params.fixedTimeStep = params.fixedTimeStep || 1 / 60;
+                params.rateLimit = params.rateLimit || true;
+                this.execute( 'init', params );
+                if ( params.gravity ) {
+                this.execute( 'setGravity', params.gravity );
+                }
+        }
 
-PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDispatcher.prototype, {
     
-    onAdd : function( object ) {
+    onAdd ( object ) {
       
         if ( object.physicsBody._physijs ) {
             
@@ -232,9 +232,9 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
 
             this.execute( 'addObject', _physijs );
         } 
-    },
+    }
     
-    onRemove : function( object ) { 
+    onRemove ( object ) { 
         
         let _physijs = object.physicsBody._physijs;
        
@@ -258,13 +258,13 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
                         delete this._materials_ref_counts[object.material._physijs.id];
                 }
         }
-    },
+    }
     
-    onSimulationResume : function() {
+    onSimulationResume () {
 	this.execute( 'onSimulationResume', { } );
-    },
+    }
     
-    simulate : function( timeStep, maxSubSteps ) {
+    simulate ( timeStep, maxSubSteps ) {
 	let object, _physijs, update;
         
         if ( AddPhysics.status._is_simulating ) {
@@ -301,10 +301,10 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
         this.execute( 'simulate', { timeStep: timeStep, maxSubSteps: maxSubSteps } );
 
         return true;
-    },
+    }
         
         
-        _updateConstraints : function( data ) {
+        _updateConstraints ( data ) {
 		var constraint, object,
 			i, offset;
 
@@ -333,8 +333,9 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
 			// Give the typed array back to the worker
 			this._worker.transferableMessage( data.buffer, [data.buffer] );
 		}
-	},
-        _updateCollisions : function( data ) {
+	}
+
+        _updateCollisions ( data ) {
 		/**
 		 * #TODO
 		 * This is probably the worst way ever to handle collisions. The inherent evilness is a residual
@@ -432,8 +433,9 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
 			// Give the typed array back to the worker
 			this._worker.transferableMessage( data.buffer, [data.buffer] );
 		}
-	},
-        addConstraint : function ( constraint, show_marker ) {
+	}
+
+        addConstraint  ( constraint, show_marker ) {
 		this._constraints[ constraint.id ] = constraint;
 		this.execute( 'addConstraint', constraint.getDefinition() );
                 
@@ -445,7 +447,7 @@ PhysicsWorld.prototype = Object.assign( PhysicsWorld.prototype , THREE.EventDisp
 
 		return constraint;
 	}
-});
+}
 
 PhysicsWorld.addPhysics = function( scene, params ){
     scene.physicsWorld = new PhysicsWorld( scene, params );
