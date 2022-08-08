@@ -27,7 +27,6 @@ import { createMaterial } from './PhysiMaterial.js';
 
 import AddPhysics from './AddPhysicsGlobals.js';
 
-import * as THREE from '../node_modules/three/build/three.module.js'
 
 // object assigned to window.Physijs
 let Physijs = Object.assign ({}, AddPhysics, { 
@@ -75,7 +74,6 @@ let Physijs = Object.assign ({}, AddPhysics, {
     Physijs.PhysicsWorld.scripts = Physijs.scripts;
     Physijs.createMaterial = createMaterial;
 
-
 export default Physijs;
 
-export {Physijs, THREE};
+export {Physijs};
