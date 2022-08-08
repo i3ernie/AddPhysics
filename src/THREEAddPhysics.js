@@ -1,6 +1,6 @@
 
 'use strict';
-import {THREE} from "./libs.es6.js";
+import  * as THREE from "three";
 import DOFConstraint from "./constraints/dof_constraint.js";
 import PointConstraint from "./constraints/PointConstraint.js";
 import SliderConstraint from "./constraints/SliderConstraint.js";

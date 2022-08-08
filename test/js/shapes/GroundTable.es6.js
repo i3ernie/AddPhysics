@@ -1,4 +1,5 @@
-import {Physijs, THREE} from "../../../src/AddPhysics.js";
+import {Physijs} from "../../../src/AddPhysics.js";
+import * as THREE from 'three';
 
 // Loader
 const loader = new THREE.TextureLoader();
@@ -13,9 +14,10 @@ let ground_material = Physijs.createMaterial(
 ground_material.map.wrapS = ground_material.map.wrapT = THREE.RepeatWrapping;
 ground_material.map.repeat.set( 2.5, 2.5 );
 
-const GroundTable = function( opts ){
+class GroundTable extends THREE.Object3D {
+    constructor ( opts ) {
 
-    THREE.Object3D.call( this );
+    super( );
     
     let ground = new THREE.Mesh(
         new THREE.BoxGeometry( 50, 1, 50 ),
@@ -63,9 +65,8 @@ const GroundTable = function( opts ){
     
     this.add( ground, bumper1, bumper2, bumper3, bumper4 );
 };
-GroundTable.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
-    constructor : GroundTable
-});
+
+};
 
 
 export default GroundTable;

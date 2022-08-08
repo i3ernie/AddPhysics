@@ -5,19 +5,18 @@
  */
 
 import { Mesh, PhysicsBody } from './PhysiMesh.js';
-import {Geometry} from '../../node_modules/three/examples/jsm/deprecated/Geometry.js';
 
 const _make = function( mesh, opt ){
     
     let points = [];
-    let geometry =  new Geometry ().fromBufferGeometry( mesh.geometry );
-    const vertices = geometry.vertices;
-    
-    for ( let i = 0; i < vertices.length; i++ ) {
+    const geometry =  mesh.geometry;
+    const vertices = geometry.attributes.position.array;
+
+    for ( let i = 0; i < vertices.length; i+=3 ) {
         points.push({
-                x: vertices[i].x,
-                y: vertices[i].y,
-                z: vertices[i].z
+                x: vertices[i],
+                y: vertices[i+1],
+                z: vertices[i+2]
         });
     }
 

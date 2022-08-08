@@ -6,7 +6,7 @@
 
 import { getObjectId, convertWorldPositionToObject } from "../physi_utils.js"
 import AddPhysics from '../AddPhysicsGlobals.js';
-import {THREE} from "../libs.es6.js";
+import * as THREE from "three";
 
 AddPhysics.addFunctions.constraint.dof = function( constraint ){
     let marker = new THREE.Mesh(

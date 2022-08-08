@@ -5,7 +5,7 @@
  */
 
 import { PhysicsBody } from './PhysiMesh.js';
-import {THREE} from "../libs.es6.js";
+import * as THREE from "three";
 
 import { BoxBody } from "./BoxMesh.js";
 import { SphereBody } from "./SphereMesh.js";
@@ -112,8 +112,8 @@ Body.addPhysics = function( mesh, opt ) {
 
         default:
             // Cone
-            v = options.size || p.height * 5;
-            console.log("PhysicWorld::unkown type of geometry: ", p );
+            let v = opt.size || mesh.height * 5;
+            console.log("PhysicWorld::unkown type of geometry: ", mesh );
             //shape = PhysicWorld.createConvexHullPhysicsShape( mesh.geometry.vertices );
 
             break;

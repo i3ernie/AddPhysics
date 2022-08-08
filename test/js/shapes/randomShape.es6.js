@@ -1,4 +1,4 @@
-import * as THREE from "../../../node_modules/three/build/three.module.js";
+import * as THREE from "three";
 
 const geos =[
     new THREE.BoxGeometry( 3, 3, 3 ),
@@ -7,7 +7,7 @@ const geos =[
     new THREE.ConeGeometry( 2, 4, 32 ),
     new THREE.OctahedronGeometry( 1.7, 1 ),
     new THREE.TorusKnotGeometry ( 1.7, .2, 32, 4 ),
-    new THREE.TorusKnotGeometry ( 1.7, .2, 32, 4 )
+    new THREE.TorusKnotGeometry ( 1.7, .2, 32, 4 ) 
 ];
 
 const randomShape = function(){

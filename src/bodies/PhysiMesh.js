@@ -8,7 +8,7 @@
 
 import { getObjectId } from '../physi_utils.js';
 import AddPhysics from '../AddPhysicsGlobals.js';
-import {THREE} from "../libs.es6.js";
+import * as THREE from "three";
 
 const options = AddPhysics.options;
 

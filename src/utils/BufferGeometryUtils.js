@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import {THREE} from "../libs.es6.js";
+import * as THREE from "three";
 
 let BufferGeometryUtils = {
 

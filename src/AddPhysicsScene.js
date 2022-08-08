@@ -5,7 +5,7 @@
  */
 // Physijs.Scene
 
-import {THREE} from "./libs.es6.js";
+import * as THREE from "three";
 import { Vehicle } from './extras/PhysicsVehicle.js';
 import PhysicsWorld from './AddPhysicsWorld.js';
 import AddPhysics from './AddPhysicsGlobals.js';

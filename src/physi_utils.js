@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-import {THREE} from "./libs.es6.js";
+import * as THREE from "three";
 
 let _temp_matrix4_1 = new THREE.Matrix4(); 
 let _temp_vector3_1 = new THREE.Vector3(); 

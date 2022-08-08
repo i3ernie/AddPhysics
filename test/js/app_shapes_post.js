@@ -16,6 +16,7 @@ import GroundTable from "./shapes/GroundTable.es6.js";
 import StandartDirLight from "./lights/DirLightStd.es6.js";
 
 
+
 Physijs.scripts.worker = '../src/AddPhysics_worker.js';
 Physijs.scripts.ammo = '../examples/js/ammo.js';
 	
