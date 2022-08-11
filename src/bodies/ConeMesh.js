@@ -39,14 +39,13 @@ Body.addPhysics = function( mesh, opt ){
 };
 
 // Physijs.ConeMesh
-let ConeMesh = function( geometry, material, mass ) {
+class ConeMesh extends Mesh {
+    constructor (geometry, material, mass ) {
         
-        Mesh.call( this, geometry, material, mass );
+        super( geometry, material, mass );
         _make.call( this, this, { mass: mass } );
+    }
 };
-ConeMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
-    constructor : ConeMesh
-});
 
 export default ConeMesh;
 export { ConeMesh, Body as ConeBody };
