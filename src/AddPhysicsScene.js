@@ -7,7 +7,7 @@
 
 import * as THREE from "three";
 import { Vehicle } from './extras/PhysicsVehicle.js';
-import PhysicsWorld from './AddPhysicsWorld.js';
+import { InterfacePhysicsWorld, PhysicsWorld } from './AddPhysicsWorld.js';
 import AddPhysics from './AddPhysicsGlobals.js';
 
 
@@ -49,12 +49,12 @@ const addObjectChildren = function( parent, object ) {
 };
 
 
-class Scene extends THREE.Scene {   
+class Scene extends InterfacePhysicsWorld( THREE.Scene ) {   
         constructor( params ) {
 
-            super();     
+            super( null, params );     
 
-            PhysicsWorld.call( this, this, params );
+            //PhysicsWorld.call( this, this, params );
             this.physicsWorld = this;
         }
 }

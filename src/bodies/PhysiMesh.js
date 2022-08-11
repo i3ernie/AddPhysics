@@ -167,17 +167,19 @@ Object.defineProperty( PhysicsBody.prototype, 'mass', {
 
 
 // Phsijs.Mesh
-let Mesh = function ( geometry, material, mass ) {
+class Mesh extends THREE.Mesh {
+        constructor ( geometry, material, mass ) {
 
-        if ( !geometry ) {
-            return;
+                if ( !geometry ) {
+                        return;
+                }
+console.log(geometry, material);
+                super( geometry, material );
+                PhysicsBody.call( this, this, { mass: mass } );
+                this.physicsBody = this;
         }
-
-        THREE.Mesh.call( this, geometry, material );
-        PhysicsBody.call( this, this, { mass: mass } );
-        this.physicsBody = this;
 };
-Mesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), PhysicsBody.prototype, {
+Object.assign( Mesh.prototype, PhysicsBody.prototype, {
     constructor : Mesh
 });
         

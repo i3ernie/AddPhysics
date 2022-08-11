@@ -42,16 +42,16 @@ Body.addPhysics = function( mesh, opt ){
     PhysicsBody.add( Body, mesh, opt );
 };
 
-const BoxMesh = function( geometry, material, mass ) {
+class BoxMesh extends Mesh {
+    constructor ( geometry, material, mass ) {
 
-    Mesh.call( this, geometry, material, mass );
-    _make.call( this, this, {mass:mass} );
+        super ( geometry, material, mass );
+
+        _make.call( this, this, {mass:mass} );
    
+    }
 };
 
-BoxMesh.prototype = Object.assign( Object.create( Mesh.prototype ), { 
-    constructor : BoxMesh 
-}); 
 
 export default BoxMesh;
 export { BoxMesh, Body as BoxBody }

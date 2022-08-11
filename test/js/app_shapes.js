@@ -245,4 +245,4 @@ Physijs.scripts.ammo = '../test/js/ammo.js';
 		};
 	})();
 	
-	window.onload = initScene;
+	initScene();

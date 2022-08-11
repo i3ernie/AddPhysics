@@ -64,10 +64,12 @@ const addObjectChildren = function( parent, object )
     }
 };
 
-class PhysicsWorld extends THREE.EventDispatcher {
+const InterfacePhysicsWorld = (Base) => class extends Base {
     constructor ( scene, params ){
             super();
                 let self = this;
+
+                scene = scene || this;
                 
                 scene.addEventListener("physicsBodyAdded", function( event ){
                         self.onAdd( event.object );
@@ -449,6 +451,12 @@ class PhysicsWorld extends THREE.EventDispatcher {
 	}
 }
 
+class PhysicsWorld extends InterfacePhysicsWorld ( THREE.EventDispatcher) {
+        constructor( scene, params ){
+                super( scene, params );
+        }
+}
+
 PhysicsWorld.addPhysics = function( scene, params ){
     scene.physicsWorld = new PhysicsWorld( scene, params );
     return scene.physicsWorld;
@@ -480,3 +488,4 @@ PhysicsWorld.prototype.setGravity = function( gravity ) {
         
 
 export default PhysicsWorld;
+export { InterfacePhysicsWorld, PhysicsWorld }
