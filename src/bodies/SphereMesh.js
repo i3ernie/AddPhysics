@@ -39,13 +39,12 @@ Body.addPhysics = function( mesh, opt ){
 };
 
 // Physijs.SphereMesh
-const SphereMesh = function( geometry, material, mass ) {
-        Mesh.call( this, geometry, material, mass );
+class SphereMesh extends Mesh {
+    constructor ( geometry, material, mass ) {
+        super( geometry, material, mass );
         _make.call( this, this, { mass: mass } );
+    }
 };
 
-SphereMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
-    constructor : SphereMesh
-});
 
 export { SphereMesh, Body as SphereBody }

@@ -38,12 +38,11 @@ Body.addPhysics = function( mesh, opt ) {
 };
 
 // Physijs.PlaneMesh
-const PlaneMesh = function ( geometry, material, mass ) {
-        Mesh.call( this, geometry, material, mass );
+class PlaneMesh extends Mesh {
+    constructor ( geometry, material, mass ) {
+        super( geometry, material, mass );
         _make.call( this, this, { mass: mass } );
+    }
 };
-PlaneMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
-    constructor : PlaneMesh
-});
 
 export { PlaneMesh, Body as PlaneBody }

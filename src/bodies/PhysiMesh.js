@@ -173,7 +173,7 @@ class Mesh extends THREE.Mesh {
                 if ( !geometry ) {
                         return;
                 }
-console.log(geometry, material);
+
                 super( geometry, material );
                 PhysicsBody.call( this, this, { mass: mass } );
                 this.physicsBody = this;

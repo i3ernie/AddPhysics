@@ -42,12 +42,12 @@ Body.addPhysics = function( mesh, opt ){
 
 
 // Physijs.CylinderMesh
-let CylinderMesh = function( geometry, material, mass ) {
+class CylinderMesh extends Mesh {
+    constructor ( geometry, material, mass ) {
         
-        Mesh.call( this, geometry, material, mass );
+        super( geometry, material, mass );
         _make.call( this, this, { mass: mass } );
+    }
 };
-CylinderMesh.prototype = Object.create( Mesh.prototype );
-CylinderMesh.prototype.constructor = CylinderMesh;
 
 export { CylinderMesh, Body as CylinderBody }

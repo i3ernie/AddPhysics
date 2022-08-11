@@ -49,14 +49,12 @@ Body.addPhysics = function( mesh, opt ){
 
 
 // Physijs.ConvexMesh
-const ConvexMesh = function( geometry, material, mass ) {
+class ConvexMesh extends Mesh { 
+    constructor ( geometry, material, mass ) {
 
-    Mesh.call( this, geometry, material, mass );
+    super( geometry, material, mass );
     _make.call( this, this, { mass: mass } );
-
+    }
 };
-ConvexMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
-    constructor : ConvexMesh
-});
 
 export { ConvexMesh, Body as ConvexBody }
