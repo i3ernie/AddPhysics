@@ -7,7 +7,7 @@
 'use strict';
 
 import Physijs from "../../src/AddPhysics.js";
-import * as THREE from "../../src/three.module.js";
+import * as THREE from "three";
 
 import Stats from "./stats.module.js";
 import TWEEN from "./tween.js";
