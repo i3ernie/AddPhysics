@@ -6,33 +6,18 @@
 
 const gulp = require('gulp');
 const concat = require('gulp-concat');
-const rollup  = require('rollup');
+const rollupBuild = require('./build/build.es.js');
+const rollupImportMapPlugin = require('rollup-plugin-import-map').rollupImportMapPlugin;
 
-
-const rollupBuild = function ( inputOptions, outputOptions, done ) {
-    // create a bundle
-    rollup.rollup(inputOptions).then( function( bundle ){
-
-        console.log( bundle.watchFiles ); // an array of file names this bundle depends on
-
-        // generate code
-        bundle.generate( outputOptions ).then( function( output ){
-
-            // or write the bundle to disk
-            bundle.write(outputOptions).then(function(){
-                done();
-            });
-        });
-
-    });
-};
 
 gulp.task('packTHREEAddPhysicsModule', function( done ){
  
     rollupBuild( {
-        input: 'src/THREEAddPhysics.js'
+        input: 'src/THREEAddPhysics.js',
+        plugins: [rollupImportMapPlugin('./import-map.json')],
+        external: ['three']
     }, {
-        file: 'dist/THREEAddPhysics.module.js',
+        file: 'dist/AddPhysics.m.js',
         exports : 'named',
         format: 'es'
     }, done );
