@@ -29,6 +29,7 @@ Syntax highlighted code block
 Examples
 
 [body.html](https://i3ernie.github.io/AddPhysics/examples/body.html)
+[memorytest.html](https://i3ernie.github.io/AddPhysics/examples/memorytest.html)
 
 For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
 
