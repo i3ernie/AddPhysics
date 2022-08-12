@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<title>Rigid body - Physijs</title>
+	
+	<link rel="stylesheet" type="text/css" href="css/styles.css" />
+	
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "https://unpkg.com/three/build/three.module.js",
+                    "OrbitControls" : "https://unpkg.com/three/examples/jsm/controls/OrbitControls.js",
+					"AddPhysics" : "../dist/AddPhysics.m.js",
+					"renderStats" : "./js/extras/renderStats.module.js"
+				}
+			}
+		</script>
+		
+		<script type="module" src="./js/app_body.js"></script>
+</head>
+
+<body>
+	<div id="heading">
+		<h1>Rigid Body + User Interaction</h1>
+		<p>Move your cursor near the boxes to push them.</p>
+	</div>
+	<div id="viewport"></div>
+</body>
+
+</html>
