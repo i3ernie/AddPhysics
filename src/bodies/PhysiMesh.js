@@ -26,7 +26,7 @@ let PhysicsBody = function( mesh, opt ){
     opt = Object.assign( {}, defaults, mesh.userData.physics, opt );
 
     
-    mesh.addEventListener("added", function(){
+    mesh.addEventListener("added", function(){ 
         this.physicsBody.scene = this.parent;
         this.parent.dispatchEvent({type:"physicsBodyAdded", object:this});
     });
@@ -34,7 +34,7 @@ let PhysicsBody = function( mesh, opt ){
         this.physicsBody.scene.dispatchEvent({type:"physicsBodyRemoved", object:this});
         this.physicsBody.scene = null;
     });
- 
+   
     this._physijs = {
         type: opt.type,
         id: getObjectId(),
