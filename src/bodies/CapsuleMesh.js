@@ -39,7 +39,8 @@ Body.addPhysics = function( mesh, opt ){
 };
 
 // Physijs.CapsuleMesh
-const CapsuleMesh = function( geometry, material, mass ) {
+class CapsuleMesh extends Mesh { 
+    constructor ( geometry, material, mass ) {
         
         Mesh.call( this, geometry, material, mass );
         _make.call( this, this, {mass:mass} );
@@ -47,9 +48,7 @@ const CapsuleMesh = function( geometry, material, mass ) {
         if ( !geometry.boundingBox ) {
                 geometry.computeBoundingBox();
         }
+    }
 };
-CapsuleMesh.prototype = Object.create( Mesh.prototype );
-CapsuleMesh.prototype.constructor = CapsuleMesh;
 
 export { CapsuleMesh, Body as CapsuleBody }
-
