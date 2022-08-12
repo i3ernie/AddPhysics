@@ -6,12 +6,24 @@
 	<title>Memory Test - Physijs</title>
 	
 	<link rel="stylesheet" type="text/css" href="css/styles.css" />
+
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "https://unpkg.com/three/build/three.module.js",
+                    "OrbitControls" : "https://unpkg.com/three/examples/jsm/controls/OrbitControls.js",
+					"AddPhysics" : "../dist/AddPhysics.m.js",
+					"renderStats" : "./js/extras/renderStats.module.js"
+				}
+			}
+		</script>
 	
 	<script type="module">
 	
 	'use strict';
-        import Physijs from "../src/physi.js";
-        import * as THREE from "../src/three.module.js";
+        import {Physijs} from "AddPhysics";
+        import * as THREE from "three";
         import Stats from "./js/stats.module.js";
         
 	
@@ -177,7 +189,7 @@
 		render_stats.update();
 	};
 	
-	window.onload = initScene;
+	initScene();
 	
 	</script>
 </head>
