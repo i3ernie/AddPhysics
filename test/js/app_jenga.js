@@ -1,8 +1,8 @@
 'use strict';
 
-import Physijs from "../../src/AddPhysics.js";
-import * as THREE from "../../node_modules/three/build/three.module.js";
-import Stats from "../../node_modules/stats.js/src/Stats.js";
+import Physijs from "AddPhysics";
+import * as THREE from "three";
+import Stats from "Stats";
 	
 Physijs.scripts.worker = '../src/AddPhysics_worker.js';
 Physijs.scripts.ammo = '../../node_modules/ammo.js/ammo.js';
@@ -35,20 +35,18 @@ Physijs.scripts.ammo = '../../node_modules/ammo.js/ammo.js';
 		
 		scene = new Physijs.Scene({ fixedTimeStep: 1 / 120 });
 		scene.setGravity(new THREE.Vector3( 0, -30, 0 ));
-		scene.addEventListener(
-			'update',
-			function() {
+		scene.addEventListener(	'update', function() {
 
 				if ( selected_block !== null ) {
 					
 					_v3.copy( mouse_position ).add( block_offset ).sub( selected_block.position ).multiplyScalar( 5 );
 					_v3.y = 0;
-					selected_block.setLinearVelocity( _v3 );
-					
+					selected_block.physicsBody.setLinearVelocity( _v3 );
+				
 					// Reactivate all of the blocks
 					_v3.set( 0, 0, 0 );
 					for ( _i = 0; _i < blocks.length; _i++ ) {
-						blocks[_i].applyCentralImpulse( _v3 );
+						blocks[_i].physicsBody.applyCentralImpulse( _v3 );
 					}
 				}
 
@@ -188,10 +186,11 @@ Physijs.scripts.ammo = '../../node_modules/ammo.js/ammo.js';
 				selected_block = intersections[0].object;
 				
 				_vector.set( 0, 0, 0 );
-				selected_block.setAngularFactor( _vector );
-				selected_block.setAngularVelocity( _vector );
-				selected_block.setLinearFactor( _vector );
-				selected_block.setLinearVelocity( _vector );
+
+				selected_block.physicsBody.setAngularFactor( _vector );
+				selected_block.physicsBody.setAngularVelocity( _vector );
+				selected_block.physicsBody.setLinearFactor( _vector );
+				selected_block.physicsBody.setLinearVelocity( _vector );
 
 				mouse_position.copy( intersections[0].point );
 				block_offset.subVectors( selected_block.position, mouse_position );
@@ -225,8 +224,8 @@ Physijs.scripts.ammo = '../../node_modules/ammo.js/ammo.js';
 			
 			if ( selected_block !== null ) {
 				_vector.set( 1, 1, 1 );
-				selected_block.setAngularFactor( _vector );
-				selected_block.setLinearFactor( _vector );
+				selected_block.physicsBody.setAngularFactor( _vector );
+				selected_block.physicsBody.setLinearFactor( _vector );
 				
 				selected_block = null;
 			}
@@ -240,4 +239,4 @@ Physijs.scripts.ammo = '../../node_modules/ammo.js/ammo.js';
 		};
 	})();
 	
-	window.onload = initScene;
+	initScene();

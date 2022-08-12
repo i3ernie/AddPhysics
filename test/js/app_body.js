@@ -6,7 +6,8 @@
 
 'use strict';
 
-import {Physijs, THREE} from "../../src/AddPhysics.js";
+import {Physijs} from "AddPhysics";
+import * as THREE from "three";
 import {render_stats, physics_stats} from "./extras/renderStats.module.js"
 	
 Physijs.scripts.worker = '../src/AddPhysics_worker.js';
@@ -148,9 +149,9 @@ const applyForce = function() {
                 distance = mouse_position.distanceTo( box.position ),
                 effect = mouse_position.clone().sub( box.position ).normalize().multiplyScalar( strength / distance ).negate(),
                 offset = mouse_position.clone().sub( box.position );
-                box.applyImpulse( effect, offset );
+                box.physicsBody.applyImpulse( effect, offset );
         }
 };
 
-window.onload = initScene;
+initScene();
 	

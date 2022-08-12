@@ -1,6 +1,6 @@
 'use strict';
-        import Physijs from '../../src/AddPhysics.js';
-        import * as THREE from '../../src/three.module.js';
+        import Physijs from 'AddPhysics';
+        import * as THREE from 'three';
         import * as util from "./util.js";
 	
 	Physijs.scripts.worker = '../src/AddPhysics_worker.js';
@@ -79,18 +79,21 @@ function init() {
   scene.simulate();
   
   render();
+
   function render() {
     stats.update();
     var delta = clock.getDelta();
     trackballControls.update(delta);
-    requestAnimationFrame(render);
-    renderer.render(scene, camera);
+    requestAnimationFrame( render );
+
+    renderer.render( scene, camera );
+    
     scene.simulate(undefined, 1);
   }
 }
 
 function createGroundAndWalls(scene) {
-  var ground_material = Physijs.createMaterial(new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture('./textures/floor-wood.jpg')}), 0.9, 0.7);
+  var ground_material = Physijs.createMaterial(new THREE.MeshPhongMaterial({map: new THREE.TextureLoader().load('./textures/floor-wood.jpg')}), 0.9, 0.7);
   var ground = new Physijs.BoxMesh(new THREE.BoxGeometry(50, 1, 80), ground_material, 0);
   scene.add(ground);
   var wall_material = Physijs.createMaterial(new THREE.MeshBasicMaterial({transparent: true, opacity: 0.1}), 0.9, 0.7);
@@ -214,4 +217,4 @@ function createRightFlipper(scene, mat) {
   return constraint;
 }
 
-export default init;
+init();

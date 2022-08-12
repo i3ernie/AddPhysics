@@ -1,8 +1,8 @@
 'use strict';
         
-import Physijs from "../../src/AddPhysics.js";
-import * as THREE from "../../node_modules/three/build/three.module.js";
-import Stats from "../../node_modules/stats.js/src/Stats.js";
+import Physijs from "AddPhysics";
+import * as THREE from "three";
+import Stats from "Stats";
 	
 	Physijs.scripts.worker = '../src/AddPhysics_worker.js';
 	Physijs.scripts.ammo = '../../node_modules/ammo.js/ammo.js';
@@ -169,4 +169,4 @@ import Stats from "../../node_modules/stats.js/src/Stats.js";
 		render_stats.update();
 	};
 	
-	window.onload = initScene;
+	initScene();

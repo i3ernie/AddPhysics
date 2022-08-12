@@ -5,7 +5,7 @@
  * @returns stats javascript object
  */
 
-import * as THREE from '../../src/three.module.js';
+import * as THREE from 'three';
 import Stats from "./stats.module.js";
 import TrackballControls from './extras/controls/TrackballControls.js';
 

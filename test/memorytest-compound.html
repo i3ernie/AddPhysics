@@ -6,6 +6,18 @@
 	<title>Memory Test - Physijs</title>
 	
 	<link rel="stylesheet" type="text/css" href="css/styles.css" />
+
+	<script async src="./js/es-module-shims.js"></script>
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../node_modules/three/build/three.module.js",
+				"OrbitControls" : "../node_modules/three/examples/jsm/controls/OrbitControls.js",
+				"AddPhysics" : "../src/AddPhysics.js",
+				"Stats" : "../../node_modules/stats.js/src/Stats.js"
+			}
+		}
+	</script>
 	
 	
 	<script type="module" src="js/app_memorytest-compound.module.js"></script>

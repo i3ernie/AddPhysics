@@ -6,8 +6,9 @@
 
 'use strict';
 
-import {Physijs, THREE} from "../../src/AddPhysics.js";
+import {Physijs} from "../../src/AddPhysics.js";
 import {render_stats, physics_stats} from "./extras/renderStats.module.js"
+import * as THREE from 'three'
 	
 	Physijs.scripts.worker = '../src/AddPhysics_worker.js';
 	Physijs.scripts.ammo = '../../node_modules/ammo.js/ammo.js';
@@ -160,4 +161,4 @@ import {render_stats, physics_stats} from "./extras/renderStats.module.js"
 		render_stats.update();
 	};
 	
-	window.onload = initScene;
+	initScene();
